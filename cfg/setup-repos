@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -xe
+
+DIR=$(dirname "$0")
+
+for file in "${DIR}/custom/*/repo.sh"
+do
+    $file
+done
