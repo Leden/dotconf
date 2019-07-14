@@ -1,0 +1,10 @@
+#!/bin/sh
+
+retval=1
+
+until [ ! retval ]
+do
+	$@
+	retval=$?
+done
+

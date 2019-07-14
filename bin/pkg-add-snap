@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -xe
+
+CMD=$(basename "$0")
+PACKAGES="$HOME/cfg/snap-packages"
+PKG_NAME=${1}
+
+if [ "x${PKG_NAME}" = "x" ]
+then
+    echo "${CMD} requires a package name as an argument"
+    exit 1
+fi
+
+touch ${PACKAGES}
+LINES=$(grep -E "^${PKG_NAME}$" ${PACKAGES} | wc -l)
+if [ "${LINES}" -ne 0 ]
+then
+    echo "${PKG_NAME} is already added. Use pkg-update to update it."
+    exit 1
+fi
+
+echo ${PKG_NAME} >>${PACKAGES}
+
+snap install --classic ${PKG_NAME}
+

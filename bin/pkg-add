@@ -1,0 +1,48 @@
+#!/bin/sh
+
+set -xe
+
+USAGE="Usage:\\n pkg-add [OPTIONS] {apt|snap|npm} package-name\\nOptions:\\n -n: no install"
+
+CMD=$(basename "$0")
+PKG_NAME=${2}
+
+while getopts "n" o
+do
+    case "${o}" in
+        n) NO_INSTALL="True" ;;
+        *) echo $USAGE && exit 1 ;;
+    esac
+done
+
+case "${1}" in
+	apt) INSTALL="sudo apt install -y" ; MANAGER="${1}" ;;
+	snap) INSTALL="sudo snap install --classic" ; MANAGER="${1}" ;;
+	pip) INSTALL="pip install -y" ; MANAGER="${1}" ;;
+        npm) INSTALL="sudo npm -g install" ; MANAGER="${1}" ;;
+	*) echo $USAGE && exit 1 ;;
+esac
+
+PACKAGES="$HOME/cfg/$MANAGER-packages"
+
+if [ "x${PKG_NAME}" = "x" ]
+then
+    echo "${CMD} requires a package name as an argument"
+    exit 1
+fi
+
+touch "${PACKAGES}"
+LINES=$(grep -E "^${PKG_NAME}$" ${PACKAGES} | wc -l)
+if [ ${LINES} -ne 0 ]
+then
+    echo "${PKG_NAME} is already added. Use pkg-update to update it."
+    exit 1
+fi
+
+echo ${PKG_NAME} >>${PACKAGES}
+
+if [ -z "${NO_INSTALL}" ]
+then
+    ${INSTALL} ${PKG_NAME}
+fi
+

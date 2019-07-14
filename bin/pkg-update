@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -xe
+
+DIR="$HOME/cfg"
+
+echo "Installing apt packages..."
+cat "${DIR}/apt-packages" | xargs sudo apt install -y
+
+echo "Installing snap packages..."
+cat "${DIR}/snap-packages" | xargs sudo snap install --classic
+
