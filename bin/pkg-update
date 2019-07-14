@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -xe
+set -x
 
 DIR="$HOME/cfg"
 
@@ -10,3 +10,5 @@ cat "${DIR}/apt-packages" | xargs sudo apt install -y
 echo "Installing snap packages..."
 cat "${DIR}/snap-packages" | xargs sudo snap install --classic
 
+echo "Installing npm packages..."
+cat "${DIR}/npm-packages" | xargs sudo npm install -g

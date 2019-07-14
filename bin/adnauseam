@@ -1,8 +1,8 @@
 #!/bin/sh
 
-retval=1
+retval=$((1))
 
-until [ ! retval ]
+until [ $retval -eq 0 ]
 do
 	$@
 	retval=$?
