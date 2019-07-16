@@ -19,7 +19,7 @@ case "${1}" in
 	apt) INSTALL="sudo apt install -y" ; MANAGER="${1}" ;;
 	snap) INSTALL="sudo snap install --classic" ; MANAGER="${1}" ;;
 	pip) INSTALL="pip install -y" ; MANAGER="${1}" ;;
-        npm) INSTALL="sudo npm -g install" ; MANAGER="${1}" ;;
+        npm) INSTALL="npm install" ; MANAGER="${1}" ;;
 	*) echo $USAGE && exit 1 ;;
 esac
 

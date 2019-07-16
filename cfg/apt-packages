@@ -11,3 +11,6 @@ python-pip
 youtube-dl
 nodejs
 npm
+htop
+ubuntu-restricted-extras
+ubuntu-restricted-addons
