@@ -5,7 +5,6 @@ set -xe
 USAGE="Usage:\\n pkg-add [OPTIONS] {apt|snap|npm} package-name\\nOptions:\\n -n: no install"
 
 CMD=$(basename "$0")
-PKG_NAME=${2}
 
 while getopts "n" o
 do
@@ -14,16 +13,17 @@ do
         *) echo $USAGE && exit 1 ;;
     esac
 done
+shift `expr $OPTIND - 1`
 
 case "${1}" in
 	apt) INSTALL="sudo apt install -y" ; MANAGER="${1}" ;;
 	snap) INSTALL="sudo snap install --classic" ; MANAGER="${1}" ;;
 	pip) INSTALL="pip install -y" ; MANAGER="${1}" ;;
-        npm) INSTALL="npm install" ; MANAGER="${1}" ;;
+        npm) INSTALL="npm install -g" ; MANAGER="${1}" ;;
 	*) echo $USAGE && exit 1 ;;
 esac
 
-PACKAGES="$HOME/cfg/$MANAGER-packages"
+PKG_NAME=${2}
 
 if [ "x${PKG_NAME}" = "x" ]
 then
@@ -31,6 +31,7 @@ then
     exit 1
 fi
 
+PACKAGES="$HOME/cfg/$MANAGER-packages"
 touch "${PACKAGES}"
 LINES=$(grep -E "^${PKG_NAME}$" ${PACKAGES} | wc -l)
 if [ ${LINES} -ne 0 ]
