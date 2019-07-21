@@ -4,7 +4,6 @@ vim
 firefox
 curl
 whois
-mono-devel
 nq
 telegram-desktop
 python-pip
@@ -14,3 +13,7 @@ ubuntu-restricted-extras
 ubuntu-restricted-addons
 pwgen
 gpg
+mono-runtime
+jq
+pv
+syncthing
