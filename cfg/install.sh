@@ -1,10 +1,13 @@
 #!/bin/sh
 
-set -e
+set -ex
 
-TAG='#:cfg:bash:bashrc'
-SNIPPET=". $HOME/cfg/bash/bashrc ${TAG}"
-LINES=$(grep -e "$TAG$" $HOME/.bashrc | wc -l )
+ensure_line_in_file () {
+	[ -f $2 ] || touch "$2"
+	grep -q "^$1$" $2 || echo "$1" >>$2
+}
 
-[ 0 -eq "$LINES" ] && echo "${SNIPPET}" >>$HOME/.bashrc
+ensure_line_in_file '. $HOME/cfg/bash/bashrc #:cfg:bash:bashrc' $HOME/.bashrc
+
+ensure_line_in_file 'source $HOME/cfg/vim/vimrc ":cfg:vim:vimrc' $HOME/.vimrc
 
