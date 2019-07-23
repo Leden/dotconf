@@ -19,3 +19,4 @@ pv
 syncthing
 libssl-dev
 exfat-fuse
+docker-compose
