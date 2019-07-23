@@ -13,3 +13,49 @@ set foldlevel=99
 " Enable folding with the spacebar
 nnoremap <space> za
 
+" proper PEP 8 indentation
+au BufNewFile,BufRead *.py
+    \ set tabstop=4
+    \ set softtabstop=4
+    \ set shiftwidth=4
+    \ set textwidth=79
+    \ set expandtab
+    \ set autoindent
+    \ set fileformat=unix
+
+" web indentation
+au BufNewFile,BufRead *.js, *.html, *.css
+    \ set tabstop=2
+    \ set softtabstop=2
+    \ set shiftwidth=2
+
+" highlight whitespace errors
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+
+set encoding=utf-8
+
+" YouCompleteMe customization
+let g:ycm_autoclose_preview_window_after_completion=1
+map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+"python with virtualenv support
+py3 << EOF
+import os
+import sys
+if 'VIRTUAL_ENV' in os.environ:
+  project_base_dir = os.environ['VIRTUAL_ENV']
+  activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+  execfile(activate_this, dict(__file__=activate_this))
+EOF
+
+" make code look pretty
+let python_highlight_all=1
+syntax on
+
+" NERDTree: hide .pyc files
+let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+
+" relative line numbers
+set rnu
+
+let g:auto_save = 1  " enable AutoSave on Vim startup
