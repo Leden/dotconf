@@ -1,3 +1,5 @@
-
-. $HOME/cfg/bash/include/*
+for incl in $HOME/cfg/bash/include/*
+do
+	source $incl
+done
 
