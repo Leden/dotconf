@@ -18,3 +18,4 @@ jq
 pv
 syncthing
 libssl-dev
+exfat-fuse
