@@ -20,3 +20,9 @@ syncthing
 libssl-dev
 exfat-fuse
 docker-compose
+entr
+tmux
+xdot
+graphviz
+libsqlite3-dev
+shellcheck
