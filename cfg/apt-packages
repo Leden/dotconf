@@ -26,3 +26,4 @@ xdot
 graphviz
 libsqlite3-dev
 shellcheck
+cmake

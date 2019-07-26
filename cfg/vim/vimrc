@@ -56,6 +56,6 @@ syntax on
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 
 " relative line numbers
-set rnu
+set nu rnu
 
 let g:auto_save = 1  " enable AutoSave on Vim startup
