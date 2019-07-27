@@ -1,0 +1,91 @@
+#!/bin/sh
+
+set -ex
+
+USAGE="Usage:  pkg {add|update}\n\tpkg add [-n] {apt|snap|npm|pip} package-name\n\t\tOptions:\n\t\t\t-n: do not install, just add to the list\n\n\tpkg update\tUpdate and install packages from the lists"
+
+die () {
+	if [ -z "$1" ]
+	then
+		echo "$USAGE"
+	else
+		echo "$1"
+	fi
+	exit 1
+}
+
+validate () {
+	printf "apt\nsnap\nnpm\npip" | grep -F -q -x "$1" 
+}
+
+install_snap () {
+	for package in "$@"
+	do
+		flags=""
+
+		( snap info "$package" | grep -q '^  stable:.*classic$' ) && flags="$flags --classic"
+
+		sudo snap install "$flags" "$package"
+	done
+}
+
+install_pip () {
+	[ -z "$VIRTUAL_ENV" ] || die 'ERROR: Can not install pip packages while in virtualenv. Deactivate and retry.'
+	( cd "$HOME" && pip install "$@" )
+}
+
+install_pkg () {
+	manager="$1"
+	shift 1
+
+	case "${manager}" in
+		apt) sudo apt install -y "$@" ;;
+		snap) install_snap "$@" ;;
+		npm) npm install -g "$@" ;;
+		pip) install_pip "$@" ;;
+		*) die ;;
+	esac
+}
+
+get_packages_file () {
+	echo "$HOME/cfg/$1-packages"
+}
+
+pkg_add () {
+	while getopts "n" o
+	do
+		case "${o}" in
+			n) no_install="True" ;;
+			*) die ;;
+		esac
+	done
+	shift $((OPTIND - 1))
+
+	manager="$1"
+	validate "$manager" || die
+
+	package="$2"
+	[ "x${package}" = "x" ] && die
+
+	packages_file=$(get_packages_file "$manager")
+	touch "$packages_file"
+
+	grep -q "^${package}$" "${packages_file}" && echo "Package ${package} already added" || echo "${package}" >>"${packages_file}"
+
+	[ -z "${no_install}" ] && install_pkg "${manager}" "${package}"
+}
+
+pkg_update () {
+	for manager in "apt" "snap" "npm"
+	do
+		packages_file=$(get_packages_file "$manager")
+		packages=$(sed 's/\n/ /g' "$packages_file")
+		install_pkg "${manager}" "$packages" 
+	done
+}
+
+case "${1}" in
+	add) shift 1 && pkg_add "$@" ;;
+	update) shift 1 && pkg_update "$@" ;;
+	*) die ;;
+esac
