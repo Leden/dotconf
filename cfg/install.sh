@@ -3,11 +3,11 @@
 set -ex
 
 ensure_line_in_file () {
-	[ -f $2 ] || touch "$2"
-	grep -q "^$1$" $2 || echo "$1" >>$2
+	[ -f "$2" ] || touch "$2"
+	grep -q "^$1$" "$2" || echo "$1" >>"$2"
 }
 
-ensure_line_in_file '. $HOME/cfg/bash/bashrc #:cfg:bash:bashrc' $HOME/.bashrc
+ensure_line_in_file '. $HOME/cfg/bash/bashrc #:cfg:bash:bashrc' "$HOME/.bashrc"
+ensure_line_in_file 'source $HOME/cfg/vim/vimrc ":cfg:vim:vimrc' "$HOME/.vimrc"
 
-ensure_line_in_file 'source $HOME/cfg/vim/vimrc ":cfg:vim:vimrc' $HOME/.vimrc
 
