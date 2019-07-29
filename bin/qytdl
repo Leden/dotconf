@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd $HOME/dls
+NQDIR=/tmp/dls nq adnauseam youtube-dl $@
+
