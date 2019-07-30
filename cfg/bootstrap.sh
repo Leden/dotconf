@@ -3,7 +3,7 @@
 set -ex
 
 sudo apt update
-sudo apt install -y git
+sudo apt install -y curl git
 
 rm -rf "$HOME/.cfg"
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
