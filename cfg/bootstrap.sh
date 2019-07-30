@@ -3,7 +3,7 @@
 set -ex
 
 sudo apt update
-sudo apt install git
+sudo apt install -y git
 
 git clone --bare git@github.com:Leden/dotconf.git "$HOME/.cfg"
 
