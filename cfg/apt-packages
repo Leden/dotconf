@@ -13,7 +13,7 @@ ubuntu-restricted-extras
 ubuntu-restricted-addons
 pwgen
 gpg
-mono-runtime
+mono-complete
 jq
 pv
 syncthing
