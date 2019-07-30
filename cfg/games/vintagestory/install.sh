@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Depends :: mono
+# Depends :: mono-complete
 
 set -xe
 
@@ -17,7 +17,8 @@ tar xzvf "$TMP_DIR/$FILENAME"
 mkdir -p "$HOME/.local/share/applications/"
 mkdir -p "$(xdg-user-dir DESKTOP)/"
 
-"$TMP_DIR/vintagestory/install.sh"
+cd "$TMP_DIR/vintagestory/"
+"./install.sh"
 
 cd "$HOME"
 rm -rf "$TMP_DIR"
