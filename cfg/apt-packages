@@ -9,7 +9,6 @@ telegram-desktop
 python-pip
 youtube-dl
 htop
-ubuntu-restricted-extras
 ubuntu-restricted-addons
 pwgen
 gpg
