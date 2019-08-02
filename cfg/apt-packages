@@ -29,3 +29,5 @@ cmake
 fluxgui
 shutter
 libgoo-canvas-perl
+xmonad
+xmobar
