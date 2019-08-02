@@ -14,3 +14,5 @@ for setup_repo in "$HOME"/cfg/custom/*/repo.sh
 do
 	$setup_repo
 done
+
+crontab "$HOME/cfg/crontab"

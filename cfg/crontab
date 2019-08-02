@@ -1,0 +1,3 @@
+MAILTO=""
+
+0 * * * * ~/bin/secrets-backup
