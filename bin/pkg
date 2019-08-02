@@ -36,7 +36,7 @@ install_snap () {
 
 install_pip () {
 	[ -z "$VIRTUAL_ENV" ] || die 'ERROR: Can not install pip packages while in virtualenv. Deactivate and retry.'
-	( cd "$HOME" && xargs pip install < "$1" )
+	( cd "$HOME" && pip install -r "$1" )
 }
 
 install_pkg () {
