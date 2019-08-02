@@ -57,6 +57,9 @@ syntax on
 " NERDTree: hide .pyc files
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 
+" NERDTree: open on Ctrl-N
+map <C-n> :NERDTreeToggle<CR>
+
 " relative line numbers
 set nu rnu
 
