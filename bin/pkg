@@ -18,36 +18,54 @@ validate () {
 	printf "apt\nsnap\nnpm\npip" | grep -F -q -x "$1" 
 }
 
-install_snap () {
+install_snaps () {
 	while read -r package
 	do
-		flags=""
-
-		( snap info "$package" | grep -q '^  stable:.*classic$' ) && flags="--classic"
-
-		if [ -z "$flags" ]
-		then
-			sudo snap install "$package"
-		else
-			sudo snap install "$flags" "$package"
-		fi
+		install_snap "$package"
 	done < "$1"
+}
+
+install_snap () {
+	package="$1"
+	flags=""
+
+	( snap info "$package" | grep -q '^  stable:.*classic$' ) && flags="--classic"
+
+	if [ -z "$flags" ]
+	then
+		sudo snap install "$package"
+	else
+		sudo snap install "$flags" "$package"
+	fi
 }
 
 install_pip () {
 	[ -z "$VIRTUAL_ENV" ] || die 'ERROR: Can not install pip packages while in virtualenv. Deactivate and retry.'
-	( cd "$HOME" && pip install -r "$1" )
+	( cd "$HOME" && pip install "$@" )
 }
 
-install_pkg () {
+install_pkgs () {
 	manager="$1"
 	packages_file="$2"
 
 	case "${manager}" in
 		apt) xargs sudo apt install -y < "$packages_file" ;;
-		snap) install_snap "$packages_file" ;;
+		snap) install_snaps "$packages_file" ;;
 		npm) xargs npm install -g < "$packages_file" ;;
-		pip) install_pip "$packages_file" ;;
+		pip) install_pip -r "$packages_file" ;;
+		*) die ;;
+	esac
+}
+
+install_pkg () {
+	manager="$1"
+	package="$2"
+
+	case "${manager}" in
+		apt) sudo apt install -y "$package" ;;
+		snap) install_snap "$package" ;;
+		npm) npm install -g "$package" ;;
+		pip) install_pip "$package" ;;
 		*) die ;;
 	esac
 }
@@ -84,7 +102,7 @@ pkg_update () {
 	for manager in "apt" "snap" "npm" "pip"
 	do
 		packages_file=$(get_packages_file "$manager")
-		install_pkg "${manager}" "$packages_file"
+		install_pkgs "${manager}" "$packages_file"
 	done
 }
 
