@@ -38,6 +38,7 @@ set encoding=utf-8
 " YouCompleteMe customization
 let g:ycm_autoclose_preview_window_after_completion=1
 map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+map <leader>r  :YcmCompleter GoToReferences<CR>
 
 "python with virtualenv support
 "py3 << EOF
