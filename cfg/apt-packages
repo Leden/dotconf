@@ -28,3 +28,4 @@ shellcheck
 cmake
 fluxgui
 shutter
+libgoo-canvas-perl
