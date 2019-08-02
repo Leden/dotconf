@@ -1,2 +1,2 @@
-podfox
+git+https://github.com/antfred/podfox.git
 pip
