@@ -31,3 +31,6 @@ shutter
 libgoo-canvas-perl
 xmonad
 xmobar
+openvpn
+network-manager-openvpn-gnome
+resolvconf
