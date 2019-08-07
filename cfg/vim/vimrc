@@ -37,7 +37,7 @@ set encoding=utf-8
 
 " YouCompleteMe customization
 let g:ycm_autoclose_preview_window_after_completion=1
-map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+map <leader>d  :YcmCompleter GoToDefinitionElseDeclaration<CR>
 map <leader>r  :YcmCompleter GoToReferences<CR>
 
 "python with virtualenv support
@@ -64,3 +64,6 @@ map <C-n> :NERDTreeToggle<CR>
 set nu rnu
 
 let g:auto_save = 1  " enable AutoSave on Vim startup
+
+" Fugitive bindings
+nnoremap <Leader>gg :Ggrep<Space>
