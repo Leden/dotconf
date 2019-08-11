@@ -34,3 +34,4 @@ xmobar
 openvpn
 network-manager-openvpn-gnome
 resolvconf
+sqlite3
