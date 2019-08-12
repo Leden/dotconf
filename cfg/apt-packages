@@ -35,3 +35,4 @@ openvpn
 network-manager-openvpn-gnome
 resolvconf
 sqlite3
+exuberant-ctags

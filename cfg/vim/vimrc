@@ -67,3 +67,6 @@ let g:auto_save = 1  " enable AutoSave on Vim startup
 
 " Fugitive bindings
 nnoremap <Leader>gg :Ggrep<Space>
+
+" Tagbar bindings
+nmap <F8> :TagbarToggle<CR>
