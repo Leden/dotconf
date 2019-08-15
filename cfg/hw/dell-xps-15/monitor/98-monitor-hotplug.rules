@@ -1,0 +1,2 @@
+KERNEL=="card0", SUBSYSTEM=="drm", ACTION=="change", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="/run/user/1000/gdm/Xauthority", RUN+="/bin/sh /usr/local/bin/monitor-hotplug.sh"
+
