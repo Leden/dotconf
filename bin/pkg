@@ -99,7 +99,8 @@ pkg_add () {
 }
 
 pkg_update () {
-	for manager in "apt" "snap" "npm" "pip"
+	managers="${1:-apt snap npm pip}"
+	for manager in $managers
 	do
 		packages_file=$(get_packages_file "$manager")
 		install_pkgs "${manager}" "$packages_file"
