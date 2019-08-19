@@ -6,7 +6,14 @@ Config
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
         , Run Date "[%a %F %H:%M]" "theDate" 10
-        , Run Com "curl" ["http://wttr.in/Vilnius?format=%l:+%C+%t"] "wttr" 600
+        , Run Com "curl" ["http://wttr.in/Vilnius?format=%l:+%C+%t"] "wttr" 60
+        , Run Battery
+            [ "-t", "<acstatus>"
+            , "--"
+            , "-O", "Charging <left>% <timeleft>"
+            , "-o", "Battery <left>% <timeleft>"
+            , "-i", "Full <left>% <timeleft>"
+            ] 10
         ]
-    , template = "%StdinReader% }{ <fc=#71f492>[%kbd%]</fc> <fc=#71a5f4>[%wttr%]</fc> <fc=#9c85e0>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=#f0f075>[%battery%]</fc> <fc=#71f492>[%kbd%]</fc> <fc=#86b4f9>[%wttr%]</fc> <fc=#bbabed>%theDate%</fc>"
     }
