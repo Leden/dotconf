@@ -1,0 +1,12 @@
+Config
+    { bgColor = "black"
+    , fgColor = "grey"
+    , position = TopW L 90
+    , commands =
+        [ Run Kbd [("us", "US"), ("ru", "RU")]
+        , Run StdinReader
+        , Run Date "[%a %F %H:%M]" "theDate" 10
+        , Run Com "curl" ["http://wttr.in/Vilnius?format=%l:+%C+%t+%w"] "wttr" 600
+        ]
+    , template = "%StdinReader% }{ <fc=#71f492>[%kbd%]</fc> <fc=#71a5f4>[%wttr%]</fc> <fc=#9c85e0>%theDate%</fc>"
+    }

@@ -30,6 +30,7 @@ Plugin 'majutsushi/tagbar'
 Plugin 'python-rope/ropevim'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'ludovicchabant/vim-gutentags'
+Plugin 'neovimhaskell/haskell-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
