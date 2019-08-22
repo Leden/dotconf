@@ -1,1 +1,6 @@
-export PROMPT_COMMAND='history -a'
+export PROMPT_COMMAND='history -a; $PROMPT_COMMAND"
+export HISTFILESIZE=
+export HISTSIZE=
+export HISTFILE=~/.bash_eternal_history
+
+shopt -s histappend
