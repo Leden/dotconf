@@ -44,6 +44,8 @@ main () {
 
         	xrandr --output "$EXT_MONITOR_NAME" --scale 2x2 --mode "$EXT_MONITOR_MODE" --fb "$FB" --pos 0x0
 	        xrandr --output "$INT_MONITOR_NAME" --scale 1x1 --pos "$INT_MONITOR_POS"
+	else
+		xrandr --output "$INT_MONITOR_NAME" --scale 1x1
 	fi
 }
 
