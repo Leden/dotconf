@@ -1,5 +1,6 @@
+set -o vi
+
 for incl in $HOME/cfg/bash/include/*
 do
-	source $incl
+	source "$incl"
 done
-
