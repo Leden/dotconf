@@ -2,6 +2,7 @@ Config
     { bgColor = "black"
     , fgColor = "grey"
     , position = TopW L 90
+    , font = "xft:Anonymous Pro:size=10:antialias=true"
     , commands =
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
