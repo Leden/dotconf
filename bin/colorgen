@@ -1,0 +1,57 @@
+#!/usr/bin/python3 -IBbbWall
+
+import collections
+import colorsys
+import itertools
+import math
+import random
+
+
+RGB = collections.namedtuple('RGB', 'r g b')
+HSV = collections.namedtuple('HSV', 'h s v')
+
+
+STATE_FILE = '/tmp/colorgen.state'
+
+
+#WHITE = RGB(255, 255, 255)
+PHI = ( 1 + math.sqrt(5) ) / 2
+
+
+def hsv_to_rgb(hsv):
+    return RGB(*(int(c * 255) for c in colorsys.hsv_to_rgb(*hsv)))
+
+
+def mix(rgb1, rgb2):
+    return RGB(*(int(c1 + c2) // 2 for (c1, c2) in itertools.zip(rgb1, rgb2)))
+
+
+def get_state():
+    try:
+        with open(STATE_FILE, 'r') as f:
+            return float(f.readlines()[0])
+    except FileNotFoundError:
+        return None
+
+
+def put_state(value):
+    with open(STATE_FILE, 'w') as f:
+        f.write(str(value))
+
+
+def main():
+    state = get_state()
+    if not state:
+        state = random.random()
+    state = (state + (1 / PHI)) % 1
+    put_state(state)
+
+    h = state
+    color_hsv = HSV(h, 0.50, 0.90)
+    color_rgb = hsv_to_rgb(color_hsv)
+
+    print('#%02x%02x%02x' % color_rgb)
+
+
+if __name__ == '__main__':
+    main()
