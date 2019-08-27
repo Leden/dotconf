@@ -2,8 +2,10 @@
 
 import collections
 import colorsys
+import fcntl
 import itertools
 import math
+import os
 import random
 
 
@@ -18,6 +20,30 @@ STATE_FILE = '/tmp/colorgen.state'
 PHI = ( 1 + math.sqrt(5) ) / 2
 
 
+def lock_file(f):
+        fcntl.lockf(f, fcntl.LOCK_EX)
+
+
+def unlock_file(f):
+        fcntl.lockf(f, fcntl.LOCK_UN)
+
+
+class StateFile(object):
+    def __init__(self, file_name):
+        self.f = open(file_name, 'w+')
+        lock_file(self.f)
+
+    def __enter__(self, *args, **kwars):
+        return self.f
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        self.f.flush()
+        os.fsync(self.f.fileno())
+        unlock_file(self.f)
+        self.f.close()
+        return exc_type is None
+
+
 def hsv_to_rgb(hsv):
     return RGB(*(int(c * 255) for c in colorsys.hsv_to_rgb(*hsv)))
 
@@ -26,27 +52,23 @@ def mix(rgb1, rgb2):
     return RGB(*(int(c1 + c2) // 2 for (c1, c2) in itertools.zip(rgb1, rgb2)))
 
 
-def get_state():
-    try:
-        with open(STATE_FILE, 'r') as f:
-            return float(f.readlines()[0])
-    except FileNotFoundError:
-        return None
+def get_state(sf):
+    lines = sf.readlines()
+    return lines and float(lines[0])
 
 
-def put_state(value):
-    with open(STATE_FILE, 'w') as f:
-        f.write(str(value))
+def put_state(sf, value):
+    sf.write(str(value))
 
 
 def main():
-    state = get_state()
-    if not state:
-        state = random.random()
-    state = (state + (1 / PHI)) % 1
-    put_state(state)
+    with StateFile(STATE_FILE) as sf:
+        h = get_state(sf)
+        if not h:
+            h = random.random()
+        h = (h + (1 / PHI)) % 1
+        put_state(sf, h)
 
-    h = state
     color_hsv = HSV(h, 0.50, 0.90)
     color_rgb = hsv_to_rgb(color_hsv)
 
