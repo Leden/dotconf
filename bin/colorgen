@@ -53,11 +53,16 @@ def mix(rgb1, rgb2):
 
 
 def get_state(sf):
-    lines = sf.readlines()
-    return lines and float(lines[0])
+    try:
+        return float(sf.readlines()[0])
+    except IndexError:
+        return None
+    except ValueError:
+        return None
 
 
 def put_state(sf, value):
+    sf.seek(0)
     sf.write(str(value))
 
 
@@ -69,7 +74,7 @@ def main():
         h = (h + (1 / PHI)) % 1
         put_state(sf, h)
 
-    color_hsv = HSV(h, 0.50, 0.90)
+    color_hsv = HSV(h, 0.6, 0.99)
     color_rgb = hsv_to_rgb(color_hsv)
 
     print('#%02x%02x%02x' % color_rgb)
