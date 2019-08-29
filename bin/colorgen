@@ -11,6 +11,7 @@ import random
 
 RGB = collections.namedtuple('RGB', 'r g b')
 HSV = collections.namedtuple('HSV', 'h s v')
+HLS = collections.namedtuple('HLS', 'h l s')
 
 
 STATE_FILE = '/tmp/colorgen.state'
@@ -44,6 +45,10 @@ class StateFile(object):
         return exc_type is None
 
 
+def hls_to_rgb(hls):
+    return RGB(*(int(c * 255) for c in colorsys.hls_to_rgb(*hls)))
+
+
 def hsv_to_rgb(hsv):
     return RGB(*(int(c * 255) for c in colorsys.hsv_to_rgb(*hsv)))
 
@@ -71,11 +76,14 @@ def main():
         h = get_state(sf)
         if not h:
             h = random.random()
-        h = (h + (1 / PHI)) % 1
+        h = (((h + (1 / PHI)) % 0.6) + 0.8 ) % 1
         put_state(sf, h)
 
-    color_hsv = HSV(h, 0.6, 0.99)
-    color_rgb = hsv_to_rgb(color_hsv)
+#    color_hsv = HSV(0.9, 0.6, 0.99)
+#    color_rgb = hsv_to_rgb(color_hsv)
+
+    color_hls = HLS(h, 0.8, 0.9)
+    color_rgb = hls_to_rgb(color_hls)
 
     print('#%02x%02x%02x' % color_rgb)
 

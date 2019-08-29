@@ -1,13 +1,13 @@
 Config
     { bgColor = "black"
     , fgColor = "grey"
-    , position = TopW L 90
-    , font = "xft:Anonymous Pro:size=10:antialias=true"
+    , position = Top
+    , font = "xft:Anonymous Pro:size=10:antialias=true,Unifont:antialias=true:size=10"
     , commands =
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
-        , Run Date "[%a %F %H:%M]" "theDate" 60
-        , Run Com "curl" ["http://wttr.in/Vilnius?format=%C+%t"] "wttr" 120
+        , Run Date "%a %F %H:%M" "theDate" 600
+        , Run Com "curl" ["http://wttr.in/Vilnius?format=%c+%t"] "wttr" 120
         , Run Com "myip" [] "ip" 120
         , Run Com "colorgen" [] "c1" 60
         , Run Com "colorgen" [] "c2" 60
@@ -17,10 +17,10 @@ Config
         , Run Battery
             [ "-t", "<acstatus>"
             , "--"
-            , "-O", "C <left>% <timeleft>"
-            , "-o", "B <left>% <timeleft>"
-            , "-i", "F <left>% <timeleft>"
+            , "-O", "🔌 <left>% <timeleft>"
+            , "-o", "🔋 <left>% <timeleft>"
+            , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=%c1%>[%battery%]</fc> <fc=%c2%>[%kbd%]</fc> <fc=%c3%>[%wttr%]</fc> <fc=%c4%>[%ip%]</fc> <fc=%c5%>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c3%>%wttr%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
     }
