@@ -7,7 +7,7 @@ import System.IO
 
 
 main = do
-    trayerproc <- spawnPipe "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 10 --transparent true --tint 0x191970 --height 12"
+    -- trayerproc <- spawnPipe "trayer --edge top --align right --SetDockType true --SetPartialStrut true --expand true --width 10 --transparent true --tint 0x191970 --height 12"
     xmproc <- spawnPipe "xmobar"
     xmonad $ defaultConfig
         { borderWidth = 1
@@ -18,7 +18,7 @@ main = do
         , handleEventHook = handleEventHook defaultConfig <+> docksEventHook
         , logHook = dynamicLogWithPP xmobarPP
                         { ppOutput = hPutStrLn xmproc
-                        , ppTitle = xmobarColor "#7de87d" "" . shorten 50
+                        , ppTitle = xmobarColor "#7de87d" "" . shorten 80
                         }
         , modMask = mod4Mask -- Win/Super key
         } `additionalKeys`
