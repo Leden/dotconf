@@ -1,5 +1,7 @@
 set -o vi
 
+export EDITOR=vim
+
 for incl in $HOME/cfg/bash/include/*
 do
 	source "$incl"
