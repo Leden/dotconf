@@ -7,7 +7,7 @@ Config
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
         , Run Date "%a %F %H:%M" "theDate" 600
-        , Run Com "curl" ["http://wttr.in/Vilnius?format=%c+%t"] "wttr" 120
+        , Run Com "curl" ["http://wttr.in/Vilnius?format=%C+%t"] "wttr" 120
         , Run Com "myip" [] "ip" 120
         , Run Com "colorgen" [] "c1" 60
         , Run Com "colorgen" [] "c2" 60
