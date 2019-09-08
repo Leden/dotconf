@@ -1,0 +1,176 @@
+#!/usr/bin/python3 -BbbIWall
+
+import argparse
+import enum
+import pathlib
+import pty
+import sys
+
+
+class Datastore(object):
+    DIR = pathlib.Path('~/.nest').expanduser()
+
+    @classmethod
+    def get_data_dir(cls):
+        cls.DIR.mkdir(parents=True, exist_ok=True)
+        return cls.DIR
+
+    @classmethod
+    def get_egg_dir(cls, name):
+        return cls.get_data_dir() / name
+
+    @classmethod
+    def get_egg_file(cls, name, file_name):
+        return cls.get_egg_dir(name) / file_name
+
+    @classmethod
+    def list_egg_dirs(cls):
+        return (f.name for f in cls.get_data_dir().iterdir() if f.is_dir())
+
+
+class Egg(object):
+    INSTALL_SCRIPT_NAME = 'install.sh'
+
+    def __init__(self, name, dir, install_script):
+        self.name = name
+        self.dir = dir
+        self.install_script = install_script
+
+    def __str__(self):
+        return f'<Egg {self.name} from {self.dir}>'
+
+    def exists(self):
+        return self.dir.exists() and self.install_script.exists()
+
+    def install(self):
+        if not self.exists():
+            raise ValueError('Egg does not exist: %s' % self)
+
+        pty.spawn(self.install_script.as_posix())
+
+    @classmethod
+    def load(cls, name):
+        egg_dir = Datastore.get_egg_dir(name)
+        install_script = Datastore.get_egg_file(name, cls.INSTALL_SCRIPT_NAME)
+        return cls(name, egg_dir, install_script)
+
+    @classmethod
+    def load_many(cls, names=None):
+        if names is None:
+            names = Datastore.list_egg_dirs()
+
+        return map(cls.load, names)
+
+
+class PackageManager(enum.Enum):
+    Apt = 'apt'
+    Snap = 'snap'
+
+    def __str__(self):
+        return self.value
+
+
+class EggTemplate(object):
+    manager = None
+    install_script_header = """
+#!/bin/sh
+set -e
+    """
+
+    def get_install_script_template(self):
+        return '\n'.join((
+            self.install_script_header,
+            self.install_script_body,
+            '\n',
+        )).strip()
+
+    def make_egg(self, package_name):
+        egg = Egg.load(package_name)
+        if egg.exists():
+            raise ValueError(f'{egg} already exists')
+
+        script = self.get_install_script_template().format(
+            package_name=package_name)
+        egg.dir.mkdir()
+        egg.install_script.write_text(script)
+        egg.install_script.chmod(0o777)
+
+        return egg
+
+
+class AptEggTemplate(EggTemplate):
+    manager = PackageManager.Apt
+    install_script_body = "sudo apt install -y {package_name}"
+
+
+class SnapEggTemplate(EggTemplate):
+    manager = PackageManager.Snap
+    install_script_body = '''
+package="{package_name}"
+flags=""
+( snap info "$package" | grep -q "^  stable:.*classic$" ) && flags="--classic"
+args="$flags $package"
+sudo snap install $args
+'''
+
+
+def get_template(manager):
+    if manager == PackageManager.Apt:
+        return AptEggTemplate()
+    elif manager == PackageManager.Snap:
+        return SnapEggTemplate()
+    else:
+        raise ValueError(f'No egg template registered for {manager}')
+
+
+class Commands(object):
+    @classmethod
+    def dispatch(cls, cmd, args):
+        if cmd == 'ls':
+            return cls.command_ls(args)
+        elif cmd == 'install':
+            return cls.command_install(args)
+        elif cmd == 'add':
+            return cls.command_add(args)
+        else:
+            raise ValueError(f'Unknown command: {cmd}')
+
+    @staticmethod
+    def command_ls(args):
+        for name in sorted(egg.name for egg in Egg.load_many()):
+            print(name)
+
+    @staticmethod
+    def command_install(args):
+        for egg in Egg.load_many(args.eggs):
+            egg.install()
+
+    @staticmethod
+    def command_add(args):
+        print(f'add {args.packages} via {args.manager}')
+        template = get_template(args.manager)
+        for package_name in args.packages:
+            egg = template.make_egg(package_name)
+            print(f'{egg} added')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Manage system configuration')
+    subparsers = parser.add_subparsers(dest='subcommand')
+    parser_ls = subparsers.add_parser('ls')
+    parser_install = subparsers.add_parser('install')
+    parser_install.add_argument('eggs', nargs='+')
+    parser_add = subparsers.add_parser('add')
+    parser_add.add_argument('manager', choices=PackageManager, type=PackageManager)
+    parser_add.add_argument('packages', nargs='+')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+    Commands.dispatch(args.subcommand, args)
+
+
+if __name__ == '__main__':
+    main()
