@@ -120,5 +120,10 @@ fi
 [ -f "$HOME/.asdf/asdf.sh" ] && . "$HOME/.asdf/asdf.sh"
 [ -f "$HOME/.asdf/completions/asdf.bash" ] && . "$HOME/.asdf/completions/asdf.bash"
 
+[ -d "$HOME/.bashrc.d" ] && \
+for incl in $HOME/.bashrc.d/*
+do
+	source "$incl"
+done
 
 . $HOME/cfg/bash/bashrc #:cfg:bash:bashrc

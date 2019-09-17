@@ -1,1 +1,0 @@
-/home/den-lesnov/cfg/custom/cheat.sh/bash_completion

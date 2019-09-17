@@ -1,0 +1,5 @@
+
+for incl in ./completions.d/*
+do
+	source "$incl"
+done
