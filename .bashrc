@@ -115,4 +115,10 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# asdf
+[ -f "$HOME/.asdf/asdf.sh" ] && . "$HOME/.asdf/asdf.sh"
+[ -f "$HOME/.asdf/completions/asdf.bash" ] && . "$HOME/.asdf/completions/asdf.bash"
+
+
 . $HOME/cfg/bash/bashrc #:cfg:bash:bashrc
