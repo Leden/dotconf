@@ -72,3 +72,7 @@ nnoremap <Leader>gg :Ggrep<Space>
 
 " Tagbar bindings
 nmap <F8> :TagbarToggle<CR>
+
+" load project-specific .vimrc
+set exrc
+set secure
