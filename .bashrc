@@ -121,7 +121,7 @@ fi
 [ -f "$HOME/.asdf/completions/asdf.bash" ] && . "$HOME/.asdf/completions/asdf.bash"
 
 [ -d "$HOME/.bashrc.d" ] && \
-for incl in $HOME/.bashrc.d/*
+for incl in `find $HOME/.bashrc.d/ -type f`
 do
 	source "$incl"
 done

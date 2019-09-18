@@ -1,5 +1,5 @@
 
-for incl in ./completions.d/*
+for incl in $HOME/.bashrc.d/completions.d/*
 do
 	source "$incl"
 done
