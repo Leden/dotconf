@@ -65,6 +65,7 @@ class Egg(object):
 class PackageManager(enum.Enum):
     Apt = 'apt'
     Snap = 'snap'
+    Go = 'go'
 
     def __str__(self):
         return self.value
@@ -84,13 +85,19 @@ set -e
             '\n',
         )).strip()
 
-    def make_egg(self, package_name):
-        egg = Egg.load(package_name)
+    def get_package_name(self, package_spec):
+        return package_spec
+
+    def make_egg(self, package_spec):
+        name = self.get_package_name(package_spec)
+        egg = Egg.load(name)
         if egg.exists():
             raise ValueError(f'{egg} already exists')
 
         script = self.get_install_script_template().format(
-            package_name=package_name)
+            package_name=name,
+            package_spec=package_spec,
+        )
         egg.dir.mkdir()
         egg.install_script.write_text(script)
         egg.install_script.chmod(0o777)
@@ -114,11 +121,24 @@ sudo snap install $args
 '''
 
 
+class GoEggTemplate(EggTemplate):
+    manager = PackageManager.Go
+    install_script_body = "go get {package_spec}"
+
+    def get_package_name(self, package_spec):
+        if '/' in package_spec:
+            parts = package_spec.split('/')
+            return parts[-1]
+        return super(package_spec)
+
+
 def get_template(manager):
     if manager == PackageManager.Apt:
         return AptEggTemplate()
     elif manager == PackageManager.Snap:
         return SnapEggTemplate()
+    elif manager == PackageManager.Go:
+        return GoEggTemplate()
     else:
         raise ValueError(f'No egg template registered for {manager}')
 
