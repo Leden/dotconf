@@ -13,6 +13,7 @@
 	lg = log -p
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	lor = log --no-merges --graph --decorate --pretty=oneline --abbrev-commit development ^master
 	wtf = log --graph -p -C1 --follow
 	ls = ls-files
 	ign = ls-files -o -i --exclude-standard
