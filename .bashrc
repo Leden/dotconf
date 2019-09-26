@@ -126,4 +126,8 @@ do
 	source "$incl"
 done
 
+# use vim for editing stuff
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
 . $HOME/cfg/bash/bashrc #:cfg:bash:bashrc
