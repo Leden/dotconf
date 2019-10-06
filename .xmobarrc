@@ -14,6 +14,8 @@ Config
         , Run Com "colorgen" [] "c3" 60
         , Run Com "colorgen" [] "c4" 60
         , Run Com "colorgen" [] "c5" 60
+        , Run Com "colorgen" [] "c6" 60
+        , Run Com "get-master-volume" [] "volume" 10
         , Run Battery
             [ "-t", "<acstatus>"
             , "--"
@@ -22,5 +24,5 @@ Config
             , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c3%>%wttr%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c3%>%wttr%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
     }
