@@ -37,3 +37,5 @@
 	hg-git-compat = true
 	track-branches = true
 
+[diff]
+	noprefix = true
