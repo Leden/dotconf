@@ -73,10 +73,6 @@ nnoremap <Leader>gg :Ggrep<Space>
 " Tagbar bindings
 nmap <F8> :TagbarToggle<CR>
 
-" Ropevim prefix bindings
-" let g:ropevim_local_prefix = '<Leader>rl'
-" let g:ropevim_global_prefix = '<Leader>rg'
-
 " load project-specific .vimrc
 set exrc
 set secure
