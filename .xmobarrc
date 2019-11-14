@@ -7,11 +7,9 @@ Config
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
         , Run Date "%a %F %H:%M" "theDate" 600
-        , Run Com "curl" ["http://wttr.in/Vilnius?format=%C+%t"] "wttr" 120
         , Run Com "myip" [] "ip" 120
         , Run Com "colorgen" [] "c1" 60
         , Run Com "colorgen" [] "c2" 60
-        , Run Com "colorgen" [] "c3" 60
         , Run Com "colorgen" [] "c4" 60
         , Run Com "colorgen" [] "c5" 60
         , Run Com "colorgen" [] "c6" 60
@@ -24,5 +22,5 @@ Config
             , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c3%>%wttr%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮  <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
     }
