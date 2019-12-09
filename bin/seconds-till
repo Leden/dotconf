@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python -c 'from datetime import datetime as d; import sys; print(int((d.strptime(sys.argv[1], "%Y-%m-%d %H:%M:%S")-d.now()).total_seconds()))' "$@"
