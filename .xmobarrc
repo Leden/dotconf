@@ -22,5 +22,5 @@ Config
             , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮  <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
     }
