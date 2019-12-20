@@ -147,42 +147,54 @@ class Commands(object):
     @classmethod
     def dispatch(cls, cmd, args):
         if cmd == 'ls':
-            return cls.command_ls(args)
+            return cls.command_ls()
         elif cmd == 'install':
-            return cls.command_install(args)
+            return cls.command_install(args.eggs)
+        elif cmd == 'add' and args.install:
+            return cls.command_add_and_install(args.manager, args.packages)
         elif cmd == 'add':
-            return cls.command_add(args)
+            return cls.command_add(args.manager, args.packages)
         else:
             raise ValueError(f'Unknown command: {cmd}')
 
     @staticmethod
-    def command_ls(args):
+    def command_ls():
         for name in sorted(egg.name for egg in Egg.load_many()):
             print(name)
 
     @staticmethod
-    def command_install(args):
-        for egg in Egg.load_many(args.eggs):
+    def command_install(eggs):
+        for egg in Egg.load_many(eggs):
             egg.install()
 
     @staticmethod
-    def command_add(args):
-        print(f'add {args.packages} via {args.manager}')
-        template = get_template(args.manager)
-        for package_name in args.packages:
+    def command_add(manager, packages):
+        print(f'add {packages} via {manager}')
+        template = get_template(manager)
+        for package_name in packages:
             egg = template.make_egg(package_name)
             print(f'{egg} added')
+
+    @staticmethod
+    def command_add_and_install(manager, packages):
+        Commands.command_add(manager, packages)
+        Commands.command_install(packages)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Manage system configuration')
     subparsers = parser.add_subparsers(dest='subcommand')
+
     parser_ls = subparsers.add_parser('ls')
+
     parser_install = subparsers.add_parser('install')
     parser_install.add_argument('eggs', nargs='+')
+
     parser_add = subparsers.add_parser('add')
     parser_add.add_argument('manager', choices=PackageManager, type=PackageManager)
     parser_add.add_argument('packages', nargs='+')
+    parser_add.add_argument('-i', '--install', action='store_true')
+
     args = parser.parse_args()
     return args
 
