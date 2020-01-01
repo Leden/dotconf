@@ -1,1 +1,1 @@
-ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -vframes 1 /home/den-lesnov/cam/$(date +\%Y\%m\%d\%H\%M).jpg
+ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -vframes 1 /home/den-lesnov/cam/$(date +\%Y\%m\%d_\%H\%M\%S).jpg
