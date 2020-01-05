@@ -30,3 +30,4 @@ fi
 if [ -d "$HOME/go/bin" ] ; then
     PATH="$HOME/go/bin:$PATH"
 fi
+if [ -e /home/den-lesnov/.nix-profile/etc/profile.d/nix.sh ]; then . /home/den-lesnov/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
