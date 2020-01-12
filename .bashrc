@@ -131,6 +131,6 @@ export VISUAL=vim
 export EDITOR="$VISUAL"
 
 # stack completion
-which stack && eval "$(stack --bash-completion-script stack)"
+( which stack >/dev/null ) && eval "$(stack --bash-completion-script stack)"
 
 . $HOME/cfg/bash/bashrc #:cfg:bash:bashrc
