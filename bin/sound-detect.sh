@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+set -e
+
 noise_threshold=1
 storage_folder=$HOME/recs
 raw_folder=/tmp/recs
@@ -7,8 +9,8 @@ split_folder=/tmp/recs/split
 sox_raw_options="-t raw -r 8k -e signed -b 16"
 split_size=$((1024 * 256)) # 256 KB
 
-mkdir -p ${raw_folder} ${split_folder}
-rm $split_folder/*
+mkdir -p "${storage_folder}" ${raw_folder} ${split_folder}
+rm -f $split_folder/*
 
 test -a ${raw_folder}/in.raw ||  mkfifo ${raw_folder}/in.raw
 
