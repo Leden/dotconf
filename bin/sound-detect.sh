@@ -25,7 +25,7 @@ do
         max_level="$(sox $sox_raw_options "${raw}" -n stats -s 16 2>&1 | awk '/^Max\ level/ {print int($3)}')"
         if [ "$max_level" -gt $noise_threshold ]
         then
-            echo -e "$(date +'%F %T')\t$max_level" | tee "$output_log"
+            echo -e "$(date +'%F %T')\t$max_level" | tee -a "$output_log"
         fi
         rm "${raw}"
     done
