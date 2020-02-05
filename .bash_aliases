@@ -5,3 +5,4 @@ alias fdlq='NQDIR=/tmp/dls fq'
 
 alias cfg='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
+alias it='git' # G key is dying on my keyboard
