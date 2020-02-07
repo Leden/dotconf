@@ -2,8 +2,10 @@
 
 import argparse
 import enum
+import os
 import pathlib
 import pty
+import subprocess
 import sys
 
 
@@ -76,7 +78,7 @@ class EggTemplate(object):
     install_script_header = """
 #!/bin/sh
 set -e
-    """
+"""
 
     def get_install_script_template(self):
         return '\n'.join((
@@ -154,6 +156,8 @@ class Commands(object):
             return cls.command_add_and_install(args.manager, args.packages)
         elif cmd == 'add':
             return cls.command_add(args.manager, args.packages)
+        elif cmd == 'edit':
+            return cls.command_edit(args.egg)
         else:
             raise ValueError(f'Unknown command: {cmd}')
 
@@ -180,6 +184,12 @@ class Commands(object):
         Commands.command_add(manager, packages)
         Commands.command_install(packages)
 
+    @staticmethod
+    def command_edit(egg_name):
+        editor = os.environ.get('EDITOR', 'vim')
+        egg = Egg.load(egg_name)
+        subprocess.call([editor, egg.install_script])
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Manage system configuration')
@@ -194,6 +204,9 @@ def parse_args():
     parser_add.add_argument('manager', choices=PackageManager, type=PackageManager)
     parser_add.add_argument('packages', nargs='+')
     parser_add.add_argument('-i', '--install', action='store_true')
+
+    parser_edit = subparsers.add_parser('edit')
+    parser_edit.add_argument('egg')
 
     args = parser.parse_args()
     return args
