@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+curl ifconfig.co/json 2>/dev/null | jq -r '.country_iso,.ip' | xargs -n2 echo
