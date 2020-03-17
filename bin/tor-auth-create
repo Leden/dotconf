@@ -1,0 +1,57 @@
+#!/bin/sh
+
+set -e
+
+ANSI_BOLD="\033[1m"
+ANSI_NORMAL="\033[0m"
+
+USAGE=$(cat <<EOF
+  Usage:
+    $(basename "$0") <address.onion> [<client-name>]
+EOF
+)
+
+target=${1%%.onion}
+client=${2:-$(cat /etc/hostname)}
+
+if [ -z "${target}" ] || [ -z "${client}" ]
+then
+	echo "$USAGE"
+	exit
+fi
+
+openssl=$(which openssl || echo "")
+basez=$(which basez || echo "")
+
+if [ -z "${openssl}" ] || [ -z "${basez}" ]
+then
+	sudo apt update
+	sudo apt install -y openssl basez
+fi
+
+openssl genpkey -algorithm x25519 -out private-key.pem
+openssl pkey -in private-key.pem -pubout -outform PEM -out public-key.pem
+
+grep -v " PRIVATE KEY" < private-key.pem | \
+    basez --base64pem --decode | \
+    tail --bytes 32 | \
+    basez --base32 | \
+    tr -d '=' > some-onion.auth_private
+
+echo -n "${target}:descriptor:x25519:" | cat - some-onion.auth_private >"${target}.auth_private"
+
+# Prepare the initial `.auth` file.
+grep -v " PUBLIC KEY" < public-key.pem | \
+    basez --base64pem --decode | \
+    tail --bytes 32 | \
+    basez --base32 | \
+    tr -d '=' > some-client.auth
+
+# Prepend the Tor descriptor fields to the base32-encoded bytes in the `.auth` file.
+echo -n "descriptor:x25519:" | cat - some-client.auth | cat >"${client}.auth"
+
+rm private-key.pem public-key.pem some-onion.auth_private some-client.auth
+
+echo "Done! Next steps:"
+echo "  - Put the $ANSI_BOLD${target}.auth_private$ANSI_NORMAL file into ClientOnionAuthDir from your torrc config;"
+echo "  - Send the $ANSI_BOLD${client}.auth$ANSI_NORMAL file to the $1 operator to be put into the respective authorized_clients dir."
