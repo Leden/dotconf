@@ -2,17 +2,12 @@ Config
     { bgColor = "black"
     , fgColor = "grey"
     , position = Top
-    , font = "xft:Anonymous Pro:size=10:antialias=true,Unifont:antialias=true:size=10"
+    , font = "xft:Liberation Mono Regular:size=10:antialias=true,Unifont:antialias=true:size=10"
     , commands =
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
         , Run Date "%a %F %H:%M" "theDate" 600
         , Run Com "myip" [] "ip" 120
-        , Run Com "colorgen" [] "c1" 60
-        , Run Com "colorgen" [] "c2" 60
-        , Run Com "colorgen" [] "c4" 60
-        , Run Com "colorgen" [] "c5" 60
-        , Run Com "colorgen" [] "c6" 60
         , Run Com "get-master-volume" [] "volume" 10
         , Run Battery
             [ "-t", "<acstatus>"
@@ -22,5 +17,6 @@ Config
             , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=%c6%>%volume%</fc> ⋮ <fc=%c1%>%battery%</fc> ⋮ <fc=%c2%>%kbd%</fc> ⋮ <fc=%c4%>%ip%</fc> ⋮ <fc=%c5%>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=#FF8B19>%volume%</fc> ⋮ <fc=#FFB919>%battery%</fc> ⋮ <fc=#FF3319>%kbd%</fc> ⋮ <fc=#1EC9F1>%ip%</fc> ⋮ <fc=#FF1E00>%theDate%</fc>"
     }
+-- Colors: paletton.com/#uid=60z0u0kl1Wx1x+IcEXDsUWkWEVB
