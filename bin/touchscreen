@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+device_id=$(xinput --list | grep "Wacom HID 488F Finger" | sed -r 's/.*id=([0-9]+).*/\1/g')
+
+_enable () {
+	xinput enable "$device_id"
+}
+
+_disable () {
+	xinput disable "$device_id"
+}
+
+_help () {
+	cat <<EOF
+Usage:
+	$(basename "$0") enable 	enable touchscreen
+	$(basename "$0") disable 	disable touchscreen
+EOF
+}
+
+case $1 in
+	enable) _enable ;;
+	disable) _disable ;;
+	*) _help ;;
+esac
