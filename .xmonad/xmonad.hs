@@ -23,7 +23,7 @@ main = do
         } `additionalKeys`
             [ ((0, 0x1008FF12), spawn "amixer -D pulse set Master toggle") -- toggle mute
             , ((0, 0x1008FFB2), spawn "amixer set Capture toggle") -- toggle mic mute
-            , ((0, 0x1008FF11), spawn "amixer -q sset Master 5%-") -- lower volume
-            , ((0, 0x1008FF13), spawn "amixer -q sset Master 5%+") -- raise volume
+            , ((0, 0x1008FF11), spawn "amixer -D pulse -q sset Master 5%-") -- lower volume
+            , ((0, 0x1008FF13), spawn "amixer -D pulse -q sset Master 5%+") -- raise volume
             , ((0, 0x1008FF41), spawn "slock") -- Lock screen
             ]
