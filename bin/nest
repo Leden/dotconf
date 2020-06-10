@@ -68,6 +68,7 @@ class PackageManager(enum.Enum):
     Apt = 'apt'
     Snap = 'snap'
     Go = 'go'
+    Pip = 'pip'
 
     def __str__(self):
         return self.value
@@ -134,6 +135,11 @@ class GoEggTemplate(EggTemplate):
         return super(package_spec)
 
 
+class PipEggTemplate(EggTemplate):
+    manager = PackageManager.Pip
+    install_script_body = "pip install {package_spec}"
+
+
 def get_template(manager):
     if manager == PackageManager.Apt:
         return AptEggTemplate()
@@ -141,6 +147,8 @@ def get_template(manager):
         return SnapEggTemplate()
     elif manager == PackageManager.Go:
         return GoEggTemplate()
+    elif manager == PackageManager.Pip:
+        return PipEggTemplate()
     else:
         raise ValueError(f'No egg template registered for {manager}')
 
