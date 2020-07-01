@@ -86,6 +86,9 @@ nmap <F8> :TagbarToggle<CR>
 " CtrlP conf
 let g:ctrlp_cmd = 'CtrlPMixed'
 
+" Syntastic conf
+let g:syntastic_python_checkers = ['python']
+
 " load project-specific .vimrc
 set exrc
 set secure
