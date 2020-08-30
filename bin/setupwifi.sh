@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 CBOLD='\033[1m'
 CITALIC='\033[3m'
