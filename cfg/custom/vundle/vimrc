@@ -33,6 +33,10 @@ Plugin 'neovimhaskell/haskell-vim'
 Plugin 'dbeniamine/cheat.sh-vim'
 Plugin 'nbouscal/vim-stylish-haskell'
 Plugin 'elmcast/elm-vim'
+Plugin 'tpope/vim-abolish'
+Plugin 'posva/vim-vue'
+Plugin 'prettier/vim-prettier'
+Plugin 'editorconfig/editorconfig-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required

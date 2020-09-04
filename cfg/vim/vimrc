@@ -18,7 +18,7 @@ au BufNewFile,BufRead *.py
     \ set tabstop=4 |
     \ set softtabstop=4 |
     \ set shiftwidth=4 |
-    \ set textwidth=79 |
+    \ set textwidth=99 |
     \ set expandtab |
     \ set autoindent |
     \ set fileformat=unix
@@ -88,6 +88,9 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 
 " Syntastic conf
 let g:syntastic_python_checkers = ['python']
+
+" jedi conf
+let g:jedi#use_splits_not_buffers = "left"
 
 " load project-specific .vimrc
 set exrc
