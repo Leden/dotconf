@@ -3,22 +3,24 @@
 	name = Denis Lesnov
 
 [alias]
-	st = status
+	br = branch
 	ci = commit
 	co = checkout
-	br = branch
 	cobr = checkout master -b
 	d = diff
 	dc = diff --cached
+	g = grep --break --heading --line-number
+	ign = ls-files -o -i --exclude-standard
 	lg = log -p
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	lor = log --no-merges --graph --decorate --pretty=oneline --abbrev-commit development ^master
-	wtf = log --graph -p -C1 --follow
+	lora = log --graph --decorate --pretty=oneline --abbrev-commit development ^master
 	ls = ls-files
-	ign = ls-files -o -i --exclude-standard
 	pu = push -u origin HEAD
-	g = grep --break --heading --line-number
+	rb = branch --no-merged development --sort=-committerdate
+	st = status
+	wtf = log --graph -p -C1 --follow
 
 [color]
 	ui = auto
