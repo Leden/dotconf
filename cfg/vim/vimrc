@@ -24,7 +24,8 @@ au BufNewFile,BufRead *.py
     \ set fileformat=unix
 
 " web indentation
-au BufNewFile,BufRead *.js,*.html,*.css
+au BufNewFile,BufRead *.js,*jsx,*.html,*.css
+    \ set expandtab |
     \ set tabstop=2 |
     \ set softtabstop=2 |
     \ set shiftwidth=2
