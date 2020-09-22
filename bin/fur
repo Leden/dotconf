@@ -1,0 +1,297 @@
+#!/bin/sh
+
+__LOGFILE="/tmp/fur.log"
+__CONFIG="$HOME/.config/fur/config.json"
+
+
+# -----------
+# Shell utils
+# -----------
+
+log() {
+	tee -a $__LOGFILE
+	echo >>$__LOGFILE
+}
+
+
+die() {
+	code="$1"
+	msg="$2"
+
+	[ -z "$msg" ] && {
+		msg="$code"
+		code=1
+	}
+
+	color="\033[91m"
+	color_off="\033[0m"
+	[ "$code" = 0 ] && {
+		color="\033[92m"
+	}
+
+	printf "${color}%s${color_off}\n" "$msg" >&2
+	exit "$code"
+}
+
+
+kv() {
+	node="$1"
+	key="$2"
+	val="$3"
+
+	touch "$node"
+	[ -z "$(jq '.' "$node")" ] && jq -n '{}' >"$node"
+
+	case "$val" in
+		'') jq -r ".$key//empty" "$node" ;;
+		*)  {
+			json="$(jq --arg key "$key" --arg val "$val" '. + {($key):$val}' "$node")"
+			echo "$json" >"$node"
+		} ;;
+	esac
+}
+
+
+config() {
+	[ ! -f "$__CONFIG" ] && {
+		mkdir -p "$(dirname -- "$__CONFIG")"
+		touch "$__CONFIG"
+		chmod 600 "$__CONFIG"
+	}
+	kv "$__CONFIG" "$1" "$2"
+}
+
+
+workspace_config() {
+	config "workspaces[\"$(pwd)\"].$1" "$2"
+}
+
+
+# -----------
+# Asana utils
+# -----------
+
+
+asana_task() {
+	task_gid="$1"
+	method="$2"
+	field="$3"
+	value="$4"
+
+	asana_token=$(workspace_config asana_token)
+
+	args=""
+	args="${args} -s"
+	args="${args} -X ${method}"
+	args="${args} -H 'Accept: application/json'"
+	args="${args} -H 'Authorization: Bearer $asana_token'"
+
+	[ "$method" = "PUT" ] && {
+		body_file=$(mktemp)
+		jq -nc --arg field "$field" --arg value "$value" '{data:{($field):$value}}' >"$body_file"
+		args="${args} -d@${body_file}"
+		args="${args} -H 'Content-Type: application/json'"
+	}
+
+	query=""
+	[ ! -z "$field" ] && {
+		query="${query}opt_fields=${field}&"
+	}
+
+	args="${args} 'https://app.asana.com/api/1.0/tasks/${task_gid}?${query}'"
+
+	jq_query="."
+	[ ! -z "$field" ] && {
+		jq_query=".data.${field}"
+	}
+
+	[ "$method" = "PUT" ] && {
+		echo "$args"
+	}
+
+	echo "$args" | xargs curl | log | jq -r "$jq_query"
+	rm -f "$body_file" >/dev/null
+}
+
+
+asana_task_gid() {
+	task_url="$1"
+	echo "$task_url" | sed -r 's|.*/([[:digit:]]+)(/f?)?$|\1|'
+}
+
+
+# ---------
+# Git utils
+# ---------
+
+
+git_current_branch() {
+	git rev-parse --abbrev-ref HEAD
+}
+
+
+git_branch_description() {
+	case $1 in
+		get) git config --get branch."$(git_current_branch)".description ;;
+		set) git config branch."$(git_current_branch)".description "$2" ;;
+		*) die "git_branch_description: invalid operation: $1" ;;
+	esac
+}
+
+
+# ------------
+# GitHub utils
+# ------------
+
+
+gh_repo_owner() {
+	gh repo view |grep "^name:" | head -n1 | awk '{print $2}' | tr '/' ' ' | awk '{print $1}'
+}
+
+
+gh_repo_name() {
+	gh repo view |grep "^name:" | head -n1 | awk '{print $2}' | tr '/' ' ' | awk '{print $2}'
+}
+
+
+gh_pr_number() {
+	gh pr list | grep "$(git_current_branch)" | awk '{print $1}'
+}
+
+
+gh_pr_url() {
+	pr_number="$1"
+	repo_name="$(gh_repo_name)"
+	repo_owner="$(gh_repo_owner)"
+	query="
+	{
+	  repository(name: \"$repo_name\", owner: \"$repo_owner\") {
+	    pullRequest(number: $pr_number) {
+	      url
+	    }
+	  }
+	}
+	"
+	gh api graphql -f query="$query" | jq -r ".data.repository.pullRequest.url"
+}
+
+
+# --------------
+# User scenarios
+# --------------
+
+
+begin_task() {
+	prefix="$1"
+	task_url="$2"
+	branch_name="$3"
+	task_gid="$(asana_task_gid "$task_url")"
+
+	[ -z "$branch_name" ] && {
+		printf '  - %s ' 'Fetching Asana task title...'
+		task_name="$(asana_task "$task_gid" GET name)"
+		printf '%s\n' 'OK!'
+		printf '  > %s ' "$task_name"
+
+		branch_name="$(echo "$task_name" | sed -r 's/([a-z0-9])([A-Z])/\1_\L\2/g;s/[^a-zA-Z0-9]+/-/g;s/^-+\|-+$//g' | tr '[:upper:]' '[:lower:]')"
+	}
+
+
+	main_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///')
+
+	printf '  - %s ' 'Stashing away the current working copy changes...'
+	stash_id=$(git stash create --include-untracked)
+	git clean -df >/dev/null
+	git checkout . >/dev/null
+	printf '%s\n' 'OK!'
+
+	printf '  - %s ' "Updating the base branch ${main_branch}..."
+	git checkout "$main_branch" >/dev/null
+	git pull >/dev/null && printf '%s\n' 'OK!'
+
+	full_branch_name="${prefix}/${branch_name}"
+
+	printf '  - %s ' "Creating the task branch ${full_branch_name}..."
+	git checkout "$main_branch" -b "$prefix"/"$branch_name"  >/dev/null
+	git checkout "$prefix"/"$branch_name"  >/dev/null
+	git_branch_description set "$task_url" >/dev/null && printf '%s\n' 'OK!'
+
+	[ ! -z "$stash_id" ] && {
+		printf '  - %s ' 'Applying the stached working copy changes...'
+		git stash apply "$stash_id" >/dev/null && printf '%s\n' 'OK!'
+	}
+
+	asana_status_field_gid="$(workspace_config asana_status_field_gid)"
+	asana_status_in_progress_gid="$(workspace_config asana_status_in_progress_gid)"
+
+	printf '  - %s ' 'Updating Asana task status to "In Progress"...'
+	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_in_progress_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+}
+
+
+pr() {
+	base_branch="$1"
+	task_url="$(git_branch_description get)"
+	[ -z "$task_url" ] && die "No task url set"
+
+	task_gid="$(asana_task_gid "$task_url")"
+	pr_title=$(asana_task "$task_gid" GET name)
+
+	printf '  - %s ' 'Pushing the branch to GitHub...'
+	git push -u origin HEAD
+
+	printf '  - %s ' 'Creating a PR in GitHub...'
+	reviewers="$(workspace_config gh_pr_reviewers)"
+	gh pr create --title "$pr_title" --body "$task_url" --reviewer "$reviewers" $([ ! -z "$base_branch" ] && echo "--base" "$base_branch" ) && printf '%s\n' 'OK!'
+
+	pr_number="$(gh_pr_number)"
+	[ -z "$pr_number" ] && die "No PR exists in GitHub"
+
+	pr_url="$(gh_pr_url "$pr_number")"
+
+	printf '  - %s ' 'Checking Asana task description...'
+	html_notes_raw="$(asana_task "$task_gid" GET html_notes)"
+	[ -n "$html_notes_raw" ] && printf '%s\n' 'OK!'
+
+	{ echo "$html_notes_raw" | grep -q "$pr_url" ; } || {
+		html_notes="$(
+			echo "$html_notes_raw" \
+			| sed -r 's|</body>|\n\n<strong>PR</strong>: <a href=\"'"$pr_url"'\">'"$pr_url"'</a> </body>|'
+		)"
+
+		printf '  - %s ' 'Updating Asana task with PR link...'
+		asana_task "$task_gid" PUT html_notes "$html_notes" >/dev/null && printf '%s\n' 'OK!'
+	}
+
+	asana_status_field_gid="$(workspace_config asana_status_field_gid)"
+	asana_status_code_review_gid="$(workspace_config asana_status_code_review_gid)"
+
+	printf '  - %s ' 'Updating Asana task status to "Code Review"...'
+	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+
+	printf '  - %s \n' 'Say that in Slack:'
+	printf '\n    %s\n' "Comrades, please review PR ${pr_url} for task ${task_url}"
+}
+
+
+feature() {
+	begin_task "feature" "$@"
+}
+
+
+fix() {
+	begin_task "fix" "$@"
+}
+
+
+edit() {
+	"${EDITOR:-"vim"}" "$(which "${1:-$0}")"
+}
+
+
+_test() {
+	echo '$- ->' "$-"
+	echo '$@ ->' "$@"
+}
+
+"$@"
