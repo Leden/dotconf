@@ -191,7 +191,7 @@ begin_task() {
 		printf '  - %s ' 'Fetching Asana task title...'
 		task_name="$(asana_task "$task_gid" GET name)"
 		printf '%s\n' 'OK!'
-		printf '  > %s ' "$task_name"
+		printf '  > %s \n' "$task_name"
 
 		branch_name="$(echo "$task_name" | sed -r 's/([a-z0-9])([A-Z])/\1_\L\2/g;s/[^a-zA-Z0-9]+/-/g;s/^-+\|-+$//g' | tr '[:upper:]' '[:lower:]')"
 	}
