@@ -118,6 +118,7 @@ colors zenburn
 " ALE
 let g:ale_fixers = {
 \   'javascript': ['prettier'],
+\   'vue': ['prettier'],
 \   'css': ['prettier'],
 \}
 let g:ale_fix_on_save = 1
