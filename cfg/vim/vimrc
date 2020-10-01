@@ -93,6 +93,9 @@ let g:syntastic_python_checkers = ['python']
 " jedi conf
 let g:jedi#use_splits_not_buffers = "left"
 
+" vim-mix-format conf
+let g:mix_format_on_save = 1
+
 " Run a shell command and display its output in a new tab
 function! s:ExecuteInShell(command)
   let command = join(map(split(a:command), 'expand(v:val)'))
@@ -109,6 +112,15 @@ function! s:ExecuteInShell(command)
 endfunction
 command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
 
+" color scheme
+colors zenburn
+
+" ALE
+let g:ale_fixers = {
+\   'javascript': ['prettier'],
+\   'css': ['prettier'],
+\}
+let g:ale_fix_on_save = 1
 
 " load project-specific .vimrc
 set exrc
