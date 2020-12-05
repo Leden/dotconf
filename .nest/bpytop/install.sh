@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 
-pip install bpytop
+pip install -U bpytop

@@ -56,9 +56,9 @@ let g:ycm_autoclose_preview_window_after_completion=1
 "import os
 "import sys
 "if 'VIRTUAL_ENV' in os.environ:
-"  project_base_dir = os.environ['VIRTUAL_ENV']
-"  activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
-"  exec(open(activate_this).read(), dict(__file__=activate_this))
+  "project_base_dir = os.environ['VIRTUAL_ENV']
+  "activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+  "exec(open(activate_this).read(), dict(__file__=activate_this))
 "EOF
 
 " make code look pretty
@@ -86,12 +86,13 @@ nmap <F8> :TagbarToggle<CR>
 
 " CtrlP conf
 let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_show_hidden = 1
 
 " Syntastic conf
 let g:syntastic_python_checkers = ['python']
 
 " jedi conf
-let g:jedi#use_splits_not_buffers = "left"
+let g:jedi#use_splits_not_buffers = "right"
 
 " vim-mix-format conf
 let g:mix_format_on_save = 1

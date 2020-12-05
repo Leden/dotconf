@@ -184,7 +184,8 @@ gh_pr_url() {
 begin_task() {
 	prefix="$1"
 	task_url="$2"
-	branch_name="$3"
+	main_branch="$3"
+	branch_name="$4"
 	task_gid="$(asana_task_gid "$task_url")"
 
 	[ -z "$branch_name" ] && {
@@ -197,7 +198,9 @@ begin_task() {
 	}
 
 
-	main_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///')
+	[ -z "$main_branch" ] && {
+		main_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///')
+	}
 
 	printf '  - %s ' 'Stashing away the current working copy changes...'
 	stash_id=$(git stash create --include-untracked)

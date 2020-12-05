@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 OS="linux"
 ARCH="amd64"
 DEB_FILE="gh_${VERSION}_${OS}_${ARCH}.deb"

@@ -42,6 +42,7 @@ Plugin 'editorconfig/editorconfig-vim'
 " Plugin 'mhinz/vim-mix-format'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'dense-analysis/ale'
+Plugin 'jmcantrell/vim-virtualenv'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
