@@ -292,9 +292,47 @@ edit() {
 }
 
 
-_test() {
-	echo '$- ->' "$-"
-	echo '$@ ->' "$@"
+require() {
+	for cmd in $@
+	do
+		which $cmd >/dev/null || die "ERROR: $cmd not found."
+	done
 }
+
+
+suggest() {
+	for cmd in $@
+	do
+		which $cmd >/dev/null || printf 'Recommended dependency %s is missing.\n' "$cmd"
+	done
+}
+
+
+# Check shell builtins and coreutils
+require \
+	awk \
+	chmod \
+	dirname \
+	echo \
+	mkdir \
+	mktemp \
+	printf \
+	rm \
+	sed \
+	tee \
+	test \
+	touch \
+	tr \
+	which \
+	xargs \
+
+# Check 3rd-party tools
+require \
+	curl \
+	gh \
+	git \
+	jq \
+
+suggest vim
 
 "$@"
