@@ -118,7 +118,7 @@ class SnapEggTemplate(EggTemplate):
     install_script_body = '''
 package="{package_name}"
 flags=""
-( snap info "$package" | grep -q "^  stable:.*classic$" ) && flags="--classic"
+( snap info "$package" | grep -q "stable:.*classic$" ) && flags="--classic"
 args="$flags $package"
 sudo snap install $args
 '''
