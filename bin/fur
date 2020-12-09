@@ -52,18 +52,35 @@ kv() {
 }
 
 
+config_git() {
+	work_tree=$(dirname "$__CONFIG")
+	git_dir="$work_tree/.git/"
+
+	[ -d "$git_dir" ] || {
+		git init "$work_tree"
+		chmod -R 700 "$git_dir"
+	}
+
+	git --work-tree="$work_tree" --git-dir="$git_dir" "$@"
+}
+
+
 config() {
 	[ ! -f "$__CONFIG" ] && {
 		mkdir -p "$(dirname -- "$__CONFIG")"
 		touch "$__CONFIG"
 		chmod 600 "$__CONFIG"
-	}
+	} >/dev/null
+
 	kv "$__CONFIG" "$1" "$2"
+
+	config_git add "$__CONFIG" >/dev/null
+	config_git commit -m "$(date +'%F %R')" >/dev/null || :
 }
 
 
 workspace_config() {
-	config "workspaces[\"$(pwd)\"].$1" "$2"
+	config "workspaces[\"$(pwd)\"].$1"
 }
 
 
@@ -72,13 +89,23 @@ workspace_config() {
 # -----------
 
 
+config_get() {
+	subconfig="$1"
+	key="$2"
+	
+	value=$($subconfig "$key")
+	[ -z "$value" ] && die "ConfigError: $key not set."
+
+	printf '%s' "$value"
+}
+
 asana_task() {
 	task_gid="$1"
 	method="$2"
 	field="$3"
 	value="$4"
 
-	asana_token=$(workspace_config asana_token)
+	asana_token=$(config_get workspace_config asana_token)
 
 	args=""
 	args="${args} -s"
@@ -136,6 +163,11 @@ git_branch_description() {
 		set) git config branch."$(git_current_branch)".description "$2" ;;
 		*) die "git_branch_description: invalid operation: $1" ;;
 	esac
+}
+
+
+git_main_branch() {
+	git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///'
 }
 
 
@@ -197,12 +229,12 @@ begin_task() {
 		branch_name="$(echo "$task_name" | sed -r 's/([a-z0-9])([A-Z])/\1_\L\2/g;s/[^a-zA-Z0-9]+/-/g;s/^-+\|-+$//g' | tr '[:upper:]' '[:lower:]')"
 	}
 
-
 	[ -z "$main_branch" ] && {
-		main_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///')
+		main_branch=$(git_main_branch)
 	}
 
 	printf '  - %s ' 'Stashing away the current working copy changes...'
+	git add . >/dev/null
 	stash_id=$(git stash create --include-untracked)
 	git clean -df >/dev/null
 	git checkout . >/dev/null
@@ -215,8 +247,8 @@ begin_task() {
 	full_branch_name="${prefix}/${branch_name}"
 
 	printf '  - %s ' "Creating the task branch ${full_branch_name}..."
-	git checkout "$main_branch" -b "$prefix"/"$branch_name"  >/dev/null
-	git checkout "$prefix"/"$branch_name"  >/dev/null
+	git checkout "$main_branch" -b "$prefix"/"$branch_name" >/dev/null || \
+	git checkout "$prefix"/"$branch_name" >/dev/null
 	git_branch_description set "$task_url" >/dev/null && printf '%s\n' 'OK!'
 
 	[ ! -z "$stash_id" ] && {
@@ -224,8 +256,8 @@ begin_task() {
 		git stash apply "$stash_id" >/dev/null && printf '%s\n' 'OK!'
 	}
 
-	asana_status_field_gid="$(workspace_config asana_status_field_gid)"
-	asana_status_in_progress_gid="$(workspace_config asana_status_in_progress_gid)"
+	asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
+	asana_status_in_progress_gid="$(config_get workspace_config asana_status_in_progress_gid)"
 
 	printf '  - %s ' 'Updating Asana task status to "In Progress"...'
 	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_in_progress_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
@@ -234,18 +266,27 @@ begin_task() {
 
 pr() {
 	base_branch="$1"
+	[ -z "$base_branch" ] && {
+		base_branch=$(git_main_branch)
+	}
+
 	task_url="$(git_branch_description get)"
 	[ -z "$task_url" ] && die "No task url set"
 
 	task_gid="$(asana_task_gid "$task_url")"
-	pr_title=$(asana_task "$task_gid" GET name)
+	task_name=$(asana_task "$task_gid" GET name)
 
 	printf '  - %s ' 'Pushing the branch to GitHub...'
 	git push -u origin HEAD
 
 	printf '  - %s ' 'Creating a PR in GitHub...'
-	reviewers="$(workspace_config gh_pr_reviewers)"
-	gh pr create --title "$pr_title" --body "$task_url" --reviewer "$reviewers" $([ ! -z "$base_branch" ] && echo "--base" "$base_branch" ) && printf '%s\n' 'OK!'
+	reviewers="$(config_get workspace_config gh_pr_reviewers)"
+	gh pr create \
+		--title "$task_name" \
+		--body "$task_url" \
+		--reviewer "$reviewers" \
+		--base "$base_branch" \
+		&& printf '%s\n' 'OK!'
 
 	pr_number="$(gh_pr_number)"
 	[ -z "$pr_number" ] && die "No PR exists in GitHub"
@@ -266,14 +307,14 @@ pr() {
 		asana_task "$task_gid" PUT html_notes "$html_notes" >/dev/null && printf '%s\n' 'OK!'
 	}
 
-	asana_status_field_gid="$(workspace_config asana_status_field_gid)"
-	asana_status_code_review_gid="$(workspace_config asana_status_code_review_gid)"
+	asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
+	asana_status_code_review_gid="$(config_get workspace_config asana_status_code_review_gid)"
 
 	printf '  - %s ' 'Updating Asana task status to "Code Review"...'
 	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
 
 	printf '  - %s \n' 'Say that in Slack:'
-	printf '\n    %s\n' "Comrades, please review PR ${pr_url} for task ${task_url}"
+	printf '\n    Comrades, please review PR %s for task "%s" [ %s ]\n' "$pr_url" "$task_name" "$task_url"
 }
 
 
@@ -293,46 +334,54 @@ edit() {
 
 
 require() {
-	for cmd in $@
+	for cmd in "$@"
 	do
-		which $cmd >/dev/null || die "ERROR: $cmd not found."
+		which "$cmd" >/dev/null || die "ERROR: $cmd not found."
 	done
 }
 
 
 suggest() {
-	for cmd in $@
+	for cmd in "$@"
 	do
-		which $cmd >/dev/null || printf 'Recommended dependency %s is missing.\n' "$cmd"
+		which "$cmd" >/dev/null || printf 'Recommended dependency %s is missing.\n' "$cmd"
 	done
 }
 
 
-# Check shell builtins and coreutils
-require \
-	awk \
-	chmod \
-	dirname \
-	echo \
-	mkdir \
-	mktemp \
-	printf \
-	rm \
-	sed \
-	tee \
-	test \
-	touch \
-	tr \
-	which \
-	xargs \
+main() {
+	set -e
 
-# Check 3rd-party tools
-require \
-	curl \
-	gh \
-	git \
-	jq \
+	# Check shell builtins and coreutils
+	require \
+		awk \
+		chmod \
+		dirname \
+		echo \
+		mkdir \
+		mktemp \
+		printf \
+		rm \
+		sed \
+		tee \
+		test \
+		touch \
+		tr \
+		which \
+		xargs \
 
-suggest vim
+	# Check 3rd-party tools
+	require \
+		curl \
+		gh \
+		git \
+		jq \
 
-"$@"
+	suggest vim
+
+	# Run the requested action
+	"$@"
+}
+
+
+main "$@"
