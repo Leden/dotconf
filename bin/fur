@@ -167,7 +167,8 @@ git_branch_description() {
 
 
 git_main_branch() {
-	git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///'
+	git remote show origin | grep HEAD | sed -r 's|.*: (.*)$|\1|'
+	#git symbolic-ref --short refs/remotes/origin/HEAD | sed 's/origin\///'
 }
 
 
@@ -230,7 +231,12 @@ begin_task() {
 	}
 
 	[ -z "$main_branch" ] && {
-		main_branch=$(git_main_branch)
+		printf '  - %s ' 'Determining the main branch name...'
+		main_branch=$(git_main_branch) 
+		[ -z "$main_branch" ] && die 'Failed to determine the main branch'
+
+		printf '%s\n' 'OK!'
+		printf '  > %s \n' "$main_branch"
 	}
 
 	printf '  - %s ' 'Stashing away the current working copy changes...'
