@@ -1,1 +1,1 @@
-source <(kubectl completion bash)
+which kubectl && source <(kubectl completion bash)
