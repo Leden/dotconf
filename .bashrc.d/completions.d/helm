@@ -1,1 +1,1 @@
-which helm && source <(helm completion bash)
+which helm >/dev/null && source <(helm completion bash)
