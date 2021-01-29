@@ -9,6 +9,7 @@ Config
         , Run Date "%a %F %H:%M" "theDate" 600
         , Run Com "myip" [] "ip" 120
         , Run Com "get-master-volume" [] "volume" 10
+        , Run Memory ["-t","🐏 <usedratio>%"] 10
         , Run Battery
             [ "-t", "<acstatus>"
             , "--"
@@ -17,6 +18,6 @@ Config
             , "-i", "█ <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=#FF8B19>%volume%</fc> ⋮ <fc=#FFB919>%battery%</fc> ⋮ <fc=#FF3319>%kbd%</fc> ⋮ <fc=#1EC9F1>%ip%</fc> ⋮ <fc=#FF1E00>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=#FF8B19>%volume%</fc> ⋮ <fc=#FFB919>%battery%</fc> ⋮ <fc=#99FF99>%memory%</fc> ⋮ <fc=#FF3319>%kbd%</fc> ⋮ <fc=#1EC9F1>%ip%</fc> ⋮ <fc=#FF1E00>%theDate%</fc>"
     }
 -- Colors: paletton.com/#uid=60z0u0kl1Wx1x+IcEXDsUWkWEVB
