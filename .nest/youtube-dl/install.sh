@@ -1,4 +1,5 @@
 #!/bin/sh
 set -e
 
-sudo apt install -y youtube-dl
+pip install -U youtube-dl
+asdf reshim
