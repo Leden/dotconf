@@ -18,7 +18,8 @@ au BufNewFile,BufRead *.py
     \ set tabstop=4 |
     \ set softtabstop=4 |
     \ set shiftwidth=4 |
-    \ set textwidth=99 |
+    \ set textwidth=88 |
+    \ set colorcolumn=88 |
     \ set expandtab |
     \ set autoindent |
     \ set fileformat=unix
@@ -127,6 +128,9 @@ let g:ale_fixers = {
 \   'css': ['prettier'],
 \}
 let g:ale_fix_on_save = 1
+
+" fix vue syntax highlighting slowness?
+let g:vue_pre_processors = []
 
 " load project-specific .vimrc
 set exrc
