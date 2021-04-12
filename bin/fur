@@ -271,6 +271,12 @@ begin_task() {
 
 
 pr() {
+	draft=""
+	[ "$1" = "-d" ] && {
+		draft="--draft"
+		shift
+	}
+
 	base_branch="$1"
 	[ -z "$base_branch" ] && {
 		base_branch=$(git_main_branch)
@@ -287,7 +293,7 @@ pr() {
 
 	printf '  - %s ' 'Creating a PR in GitHub...'
 	reviewers="$(config_get workspace_config gh_pr_reviewers)"
-	gh pr create \
+	gh pr create $draft \
 		--title "$task_name" \
 		--body "$task_url" \
 		--reviewer "$reviewers" \
@@ -316,11 +322,13 @@ pr() {
 	asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
 	asana_status_code_review_gid="$(config_get workspace_config asana_status_code_review_gid)"
 
-	printf '  - %s ' 'Updating Asana task status to "Code Review"...'
-	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+	[ -z "$draft" ] && {
+		printf '  - %s ' 'Updating Asana task status to "Code Review"...'
+		asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
 
-	printf '  - %s \n' 'Say that in Slack:'
-	printf '\n    Comrades, please review PR %s for task "%s" [ %s ]\n' "$pr_url" "$task_name" "$task_url"
+		printf '  - %s \n' 'Say that in Slack:'
+		printf '\n    Comrades, please review PR %s for task "%s" [ %s ]\n' "$pr_url" "$task_name" "$task_url"
+	}
 }
 
 
