@@ -10,6 +10,7 @@ repo_owner="prusa3d"
 repo_name="PrusaSlicer"
 install_dir="/opt/$repo_owner/$repo_name"
 filename="$repo_name"
+symlink="$HOME/bin/$filename"
 
 query="
 query { 
@@ -48,4 +49,4 @@ cd "$install_dir"
 wget "$url" -O "$filename"
 chmod +x "$filename"
 
-ln -s "$install_dir/$filename" "$HOME/bin/$filename"
+[ -L "$symlink" ] || ln -s "$install_dir/$filename" "$symlink"
