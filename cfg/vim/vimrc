@@ -126,6 +126,7 @@ let g:ale_fixers = {
 \   'javascript': [],
 \   'vue': [],
 \   'css': [],
+\   'yaml': [],
 \}
 let g:ale_fix_on_save = 1
 
