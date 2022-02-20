@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -eux
 
 
 which gh >/dev/null || {
@@ -12,35 +12,40 @@ install_dir="/opt/$repo_owner/$repo_name"
 filename="$repo_name"
 symlink="$HOME/bin/$filename"
 
-query="
-query { 
-  repository(name: \"$repo_name\", owner: \"$repo_owner\") {
-    name
-    releases(last: 20) {
-      nodes {
-        name
-        url
-        isLatest
-      	releaseAssets(first: 20) {
-          nodes {
-            name
-            url
-          }
-        }
-      }
-    }
-  }
-}
-"
 
-url=$(gh api graphql -f query="$query" | jq -r '
-  .data.repository.releases.nodes[]
-  | select(.isLatest==true)
-  | .releaseAssets.nodes[]
-  | select(.name|test("GTK3.*AppImage$"))
-  | .url'
+#query="
+#query { 
+#  repository(name: \"$repo_name\", owner: \"$repo_owner\") {
+#    name
+#    releases(last: 20) {
+#      nodes {
+#        name
+#        url
+#        isLatest
+#      	releaseAssets(first: 20) {
+#          nodes {
+#            name
+#            url
+#          }
+#        }
+#      }
+#    }
+#  }
+#}
+#"
+#
+#url=$(gh api graphql -f query="$query" | tee /proc/self/fd/2 | jq -r '
+#  .data.repository.releases.nodes[]
+#  | select(.isLatest==true)
+#  | .releaseAssets.nodes[]
+#  | select(.name|test("GTK3.*AppImage$"))
+#  | .url'
+#)
+
+url=$(curl -sL https://github.com/${repo_owner}/${repo_name}/releases/latest \
+  | python -c 'import sys,re; print(re.search(r"href=\"(.*linux-x64.*GTK3.*AppImage)\"", sys.stdin.read())[1])'
 )
-
+url="https://github.com${url}"
 
 sudo mkdir -p "$install_dir"
 sudo chown -R "$(whoami):" "$install_dir"
