@@ -98,6 +98,8 @@ let g:syntastic_python_checkers = ['python']
 
 " jedi conf
 let g:jedi#use_splits_not_buffers = "right"
+let g:jedi#completions_enabled = 0
+let g:jedi#show_call_signatures = 2
 
 " vim-mix-format conf
 let g:mix_format_on_save = 1

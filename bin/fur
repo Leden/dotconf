@@ -84,28 +84,31 @@ workspace_config() {
 }
 
 
+config_get() {
+	subconfig="$1"
+	key="$2"
+	allow_missing="$3"
+	
+	value=$($subconfig "$key")
+	[ -z "$value" ] && [ ! "$allow_missing" ] && die "ConfigError: $key not set."
+
+	printf '%s' "$value"
+}
+		
+
 # -----------
 # Asana utils
 # -----------
 
 
-config_get() {
-	subconfig="$1"
-	key="$2"
-	
-	value=$($subconfig "$key")
-	[ -z "$value" ] && die "ConfigError: $key not set."
-
-	printf '%s' "$value"
-}
-
 asana_task() {
-	task_gid="$1"
+	task_url="$1"
 	method="$2"
 	field="$3"
 	value="$4"
 
 	asana_token=$(config_get workspace_config asana_token)
+	task_gid=$(asana_task_gid "$task_url")
 
 	args=""
 	args="${args} -s"
@@ -146,6 +149,66 @@ asana_task_gid() {
 	echo "$task_url" | sed -r 's|.*/([[:digit:]]+)(/f?)?$|\1|'
 }
 
+
+# ------------
+# Notion utils
+# ------------
+
+
+notion_task() {
+	task_url="$1"
+	method="$2"
+	field="$3"
+	value="$4"
+
+	case "$field" in
+		name) {
+			case "$method" in
+				GET) notion_task_name "$task_url";;
+			esac
+		} ;;
+	esac
+}
+
+
+notion_task_gid() {
+	task_url="$1"
+	printf '%s' "$task_url" | sed -r 's|.*-(.+)/?$|\1|'
+}
+
+
+notion_task_name() {
+	task_url="$1"
+	printf '%s' "$task_url" | sed -r 's|.+/([^/]+)-.+/?$|\1|'
+}
+
+
+# ------------------
+# Task tracker utils
+# ------------------
+
+get_task_tracker() {
+	task_url="$1"
+	case "$task_url" in
+		https://www.notion.so/*) printf 'notion' ;;
+		https://app.asana.com/*) printf 'asana' ;;
+		*) die "Unknown task tracker: $task_url" ;;
+	esac
+}
+
+task_tracker_task() {
+	task_tracker="$1"
+	shift
+	backend="${task_tracker}_task"
+	"$backend" "$@"
+}
+
+task_tracker_task_gid() {
+	task_tracker="$1"
+	shift
+	backend="${task_tracker}_task_gid"
+	"$backend" "$@"
+}
 
 # ---------
 # Git utils
@@ -219,11 +282,13 @@ begin_task() {
 	task_url="$2"
 	main_branch="$3"
 	branch_name="$4"
-	task_gid="$(asana_task_gid "$task_url")"
+
+	task_tracker=$(get_task_tracker "$task_url")
+	task_gid="$(task_tracker_task_gid "$task_tracker" "$task_url")"
 
 	[ -z "$branch_name" ] && {
-		printf '  - %s ' 'Fetching Asana task title...'
-		task_name="$(asana_task "$task_gid" GET name)"
+		printf '  - %s ' 'Fetching task title...'
+		task_name="$(task_tracker_task "$task_tracker" "$task_url" GET name)"
 		printf '%s\n' 'OK!'
 		printf '  > %s \n' "$task_name"
 
@@ -262,18 +327,23 @@ begin_task() {
 		git stash apply "$stash_id" >/dev/null && printf '%s\n' 'OK!'
 	}
 
-	asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
-	asana_status_in_progress_gid="$(config_get workspace_config asana_status_in_progress_gid)"
+  [ "$task_tracker" = "asana" ] && {
+		asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
+		asana_status_in_progress_gid="$(config_get workspace_config asana_status_in_progress_gid)"
 
-	printf '  - %s ' 'Updating Asana task status to "In Progress"...'
-	asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_in_progress_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+		printf '  - %s ' 'Updating Asana task status to "In Progress"...'
+		asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_in_progress_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+	}
 }
 
 
 pr() {
+	gh_pr_create_args=""
+
 	draft=""
 	[ "$1" = "-d" ] && {
 		draft="--draft"
+	  gh_pr_create_args="$gh_pr_create_args $draft"
 		shift
 	}
 
@@ -281,23 +351,27 @@ pr() {
 	[ -z "$base_branch" ] && {
 		base_branch=$(git_main_branch)
 	}
+	gh_pr_create_args="$gh_pr_create_args --base $base_branch"
 
 	task_url="$(git_branch_description get)"
 	[ -z "$task_url" ] && die "No task url set"
+	gh_pr_create_args="$gh_pr_create_args --body $task_url"
 
-	task_gid="$(asana_task_gid "$task_url")"
-	task_name=$(asana_task "$task_gid" GET name)
+	task_tracker=$(get_task_tracker "$task_url")
+
+	task_gid="$(task_tracker_task_gid "$task_tracker" "$task_url")"
+	task_name=$(task_tracker_task "$task_tracker" "$task_url" GET name)
+	gh_pr_create_args="$gh_pr_create_args --title '$task_name'"
 
 	printf '  - %s ' 'Pushing the branch to GitHub...'
 	git push -u origin HEAD
 
 	printf '  - %s ' 'Creating a PR in GitHub...'
-	reviewers="$(config_get workspace_config gh_pr_reviewers)"
-	gh pr create $draft \
-		--title "$task_name" \
-		--body "$task_url" \
-		--reviewer "$reviewers" \
-		--base "$base_branch" \
+	reviewers="$(config_get workspace_config gh_pr_reviewers allow_missing)"
+	[ -n "$reviewers" ] && {
+		gh_pr_create_args="$gh_pr_create_args --reviewer $reviewers"
+	}
+	printf '%s' "$gh_pr_create_args" | xargs gh pr create \
 		&& printf '%s\n' 'OK!'
 
 	pr_number="$(gh_pr_number)"
@@ -305,29 +379,31 @@ pr() {
 
 	pr_url="$(gh_pr_url "$pr_number")"
 
-	printf '  - %s ' 'Checking Asana task description...'
-	html_notes_raw="$(asana_task "$task_gid" GET html_notes)"
-	[ -n "$html_notes_raw" ] && printf '%s\n' 'OK!'
+	[ "$task_tracker" = "asana" ] && {
+		printf '  - %s ' 'Checking Asana task description...'
+		html_notes_raw="$(asana_task "$task_gid" GET html_notes)"
+		[ -n "$html_notes_raw" ] && printf '%s\n' 'OK!'
 
-	{ echo "$html_notes_raw" | grep -q "$pr_url" ; } || {
-		html_notes="$(
-			echo "$html_notes_raw" \
-			| sed -r 's|</body>|\n\n<strong>PR</strong>: <a href=\"'"$pr_url"'\">'"$pr_url"'</a> </body>|'
-		)"
+		{ echo "$html_notes_raw" | grep -q "$pr_url" ; } || {
+			html_notes="$(
+				echo "$html_notes_raw" \
+				| sed -r 's|</body>|\n\n<strong>PR</strong>: <a href=\"'"$pr_url"'\">'"$pr_url"'</a> </body>|'
+			)"
 
-		printf '  - %s ' 'Updating Asana task with PR link...'
-		asana_task "$task_gid" PUT html_notes "$html_notes" >/dev/null && printf '%s\n' 'OK!'
-	}
+			printf '  - %s ' 'Updating Asana task with PR link...'
+			asana_task "$task_gid" PUT html_notes "$html_notes" >/dev/null && printf '%s\n' 'OK!'
+		}
 
-	asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
-	asana_status_code_review_gid="$(config_get workspace_config asana_status_code_review_gid)"
+		asana_status_field_gid="$(config_get workspace_config asana_status_field_gid)"
+		asana_status_code_review_gid="$(config_get workspace_config asana_status_code_review_gid)"
 
-	[ -z "$draft" ] && {
-		printf '  - %s ' 'Updating Asana task status to "Code Review"...'
-		asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
+		[ -z "$draft" ] && {
+			printf '  - %s ' 'Updating Asana task status to "Code Review"...'
+			asana_task "$task_gid" PUT custom_fields '{"'"$asana_status_field_gid"'":"'"$asana_status_code_review_gid"'"}' >/dev/null && printf '%s\n' 'OK!'
 
-		printf '  - %s \n' 'Say that in Slack:'
-		printf '\n    Comrades, please review PR %s for task "%s" [ %s ]\n' "$pr_url" "$task_name" "$task_url"
+			printf '  - %s \n' 'Say that in Slack:'
+			printf '\n    Comrades, please review PR %s for task "%s" [ %s ]\n' "$pr_url" "$task_name" "$task_url"
+		}
 	}
 }
 
@@ -339,6 +415,11 @@ feature() {
 
 fix() {
 	begin_task "fix" "$@"
+}
+
+
+chore() {
+	begin_task "chore" "$@"
 }
 
 

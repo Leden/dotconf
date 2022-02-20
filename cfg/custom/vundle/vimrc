@@ -14,19 +14,19 @@ Plugin 'gmarik/Vundle.vim'
 " add all your plugins here (note older versions of Vundle
 " used Bundle instead of Plugin)
 Plugin 'tmhedberg/SimpylFold'
-" Plugin 'vim-scripts/indentpython.vim'
-" Plugin 'Valloric/YouCompleteMe'
-" Plugin 'vim-syntastic/syntastic'
-" Plugin 'nvie/vim-flake8'
+"Plugin 'vim-scripts/indentpython.vim'
+"Plugin 'Valloric/YouCompleteMe'
+Plugin 'vim-syntastic/syntastic'  " Syntax checking
+"Plugin 'nvie/vim-flake8'
 Plugin 'jnurmine/Zenburn'
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'kien/ctrlp.vim'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
-Plugin 'vim-scripts/vim-auto-save'
+"Plugin 'vim-scripts/vim-auto-save'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'majutsushi/tagbar'
+"Plugin 'majutsushi/tagbar'
 Plugin 'davidhalter/jedi-vim'
 " Plugin 'ludovicchabant/vim-gutentags'
 " Plugin 'neovimhaskell/haskell-vim'
@@ -40,9 +40,10 @@ Plugin 'editorconfig/editorconfig-vim'
 " Plugin 'slashmili/alchemist.vim'
 " Plugin 'elixir-editors/vim-elixir'
 " Plugin 'mhinz/vim-mix-format'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'dense-analysis/ale'
+Plugin 'sheerun/vim-polyglot'  " Syntax higlighting
+"Plugin 'dense-analysis/ale'
 Plugin 'jmcantrell/vim-virtualenv'
+Plugin 'codota/tabnine-vim'  " Autocomplete
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
