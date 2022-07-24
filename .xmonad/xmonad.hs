@@ -26,4 +26,7 @@ main = do
             , ((0, 0x1008FF11), spawn "amixer -D pulse -q sset Master 5%-") -- lower volume
             , ((0, 0x1008FF13), spawn "amixer -D pulse -q sset Master 5%+") -- raise volume
             , ((0, 0x1008FF41), spawn "slock") -- Lock screen
+            , ((mod4Mask .|. mod1Mask, xK_F1), spawn "setxkbmap us") -- Win+AltL+F1: US keyb layout
+            , ((mod4Mask .|. mod1Mask, xK_F2), spawn "setxkbmap ru") -- Win+AltL+F2: RU keyb layout
+            , ((mod4Mask .|. mod1Mask, xK_F3), spawn "setxkbmap lt") -- Win+AltL+F3: LT keyb layout
             ]

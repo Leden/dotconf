@@ -41,7 +41,7 @@ Plugin 'editorconfig/editorconfig-vim'
 " Plugin 'elixir-editors/vim-elixir'
 " Plugin 'mhinz/vim-mix-format'
 Plugin 'sheerun/vim-polyglot'  " Syntax higlighting
-"Plugin 'dense-analysis/ale'
+Plugin 'dense-analysis/ale'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'codota/tabnine-vim'  " Autocomplete
 
