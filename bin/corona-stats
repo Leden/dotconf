@@ -1,0 +1,6 @@
+#!/bin/sh
+
+country="${1:-LT}"
+lines=7
+
+curl -s "https://corona-stats.online/${country}?source=2" | head -n "${lines}"
