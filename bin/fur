@@ -124,14 +124,14 @@ asana_task() {
 	}
 
 	query=""
-	[ ! -z "$field" ] && {
+	[ -n "$field" ] && {
 		query="${query}opt_fields=${field}&"
 	}
 
 	args="${args} 'https://app.asana.com/api/1.0/tasks/${task_gid}?${query}'"
 
 	jq_query="."
-	[ ! -z "$field" ] && {
+	[ -n "$field" ] && {
 		jq_query=".data.${field}"
 	}
 
@@ -322,8 +322,8 @@ begin_task() {
 	git checkout "$prefix"/"$branch_name" >/dev/null
 	git_branch_description set "$task_url" >/dev/null && printf '%s\n' 'OK!'
 
-	[ ! -z "$stash_id" ] && {
-		printf '  - %s ' 'Applying the stached working copy changes...'
+	[ -n "$stash_id" ] && {
+		printf '  - %s ' 'Applying the stashed working copy changes...'
 		git stash apply "$stash_id" >/dev/null && printf '%s\n' 'OK!'
 	}
 
@@ -424,14 +424,43 @@ chore() {
 
 
 edit() {
-	"${EDITOR:-"vim"}" "$(which "${1:-$0}")"
+	"${EDITOR:-"vim"}" "$(command -v "${1:-$0}")"
+}
+
+
+trigger_ci() {
+	target_branch="$1"
+	commit_msg="${2:-"trigger ci"}"
+	current_branch=$(git_current_branch)
+
+	printf '  - %s ' 'Stashing away the current working copy changes...'
+	git add . >/dev/null
+	stash_id=$(git stash create --include-untracked)
+	git clean -df >/dev/null
+	git checkout . >/dev/null
+	printf '%s\n' 'OK!'
+
+	[ -n "$target_branch" ] && [ "$target_branch" != "$current_branch" ] && {
+		printf '  - Switching to the %s branch...' "$target_branch"
+		git fetch >/dev/null && git checkout "$target_branch" >/dev/null && printf '%s\n' 'OK!'
+	}
+
+	git pull
+	git commit -m "$commit_msg"
+	git push
+	git checkout "$current_branch"
+
+	[ -n "$stash_id" ] && {
+		printf '  - %s ' 'Applying the stashed working copy changes...'
+		git stash apply "$stash_id" >/dev/null && printf '%s\n' 'OK!'
+	}
 }
 
 
 require() {
 	for cmd in "$@"
 	do
-		which "$cmd" >/dev/null || die "ERROR: $cmd not found."
+		command -v "$cmd" >/dev/null || die "ERROR: $cmd not found."
 	done
 }
 
@@ -439,7 +468,7 @@ require() {
 suggest() {
 	for cmd in "$@"
 	do
-		which "$cmd" >/dev/null || printf 'Recommended dependency %s is missing.\n' "$cmd"
+		command -v "$cmd" >/dev/null || printf 'Recommended dependency %s is missing.\n' "$cmd"
 	done
 }
 

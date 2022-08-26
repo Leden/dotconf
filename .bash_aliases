@@ -8,3 +8,5 @@ alias cfg='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias it='git' # G key is dying on my keyboard
 
 alias cal='ncal -M'
+
+alias less='less -IR'
