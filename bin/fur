@@ -446,7 +446,7 @@ trigger_ci() {
 	}
 
 	git pull
-	git commit -m "$commit_msg"
+	git commit -m "$commit_msg" --allow-empty
 	git push
 	git checkout "$current_branch"
 
