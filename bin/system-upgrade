@@ -1,0 +1,21 @@
+#!/bin/sh
+
+
+_upgrade() {
+	command -v apt && {
+		sudo apt update
+		sudo apt upgrade -y
+		sudo apt autoremove -y
+	}
+
+	command -v snap && {
+		sudo snap refresh
+	}
+
+	command -v flatpak && {
+		flatpak update -y
+	}
+}
+
+
+_upgrade
