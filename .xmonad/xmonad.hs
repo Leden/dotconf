@@ -29,4 +29,5 @@ main = do
             , ((mod4Mask .|. mod1Mask, xK_F1), spawn "setxkbmap us") -- Win+AltL+F1: US keyb layout
             , ((mod4Mask .|. mod1Mask, xK_F2), spawn "setxkbmap ru") -- Win+AltL+F2: RU keyb layout
             , ((mod4Mask .|. mod1Mask, xK_F3), spawn "setxkbmap lt") -- Win+AltL+F3: LT keyb layout
+            , ((mod4Mask .|. mod1Mask, xK_F4), spawn "setxkbmap 'us(altgr-intl)'") -- Win+AltL+F4: US-intl keyb layout
             ]
