@@ -1,0 +1,28 @@
+#!/bin/sh
+
+DEV="${2:-/dev/mmcblk0p1}"
+MAPPER="vault"
+
+open () {
+    t="$(mktemp)" || exit
+    trap 'rm -f -- "$t"' EXIT
+
+    printf '%s' "# Type in the passphrase on the line(s) below this one." >"$t"
+
+    "${EDITOR:-vim}" "$t"
+
+    sed -i'' '1d' "$t"
+
+    sudo cryptsetup 'open' --type luks "$DEV" --key-file="$t" "$MAPPER" --verbose
+
+    rm -f -- "$t"
+    trap - EXIT
+    exit
+}
+
+close () {
+    sudo umount "/dev/mapper/$MAPPER"
+    sudo cryptsetup 'close' "$MAPPER"
+}
+
+"$1"
