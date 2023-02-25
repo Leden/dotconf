@@ -1,5 +1,9 @@
-dir="$HOME/.asdf/installs/rust/stable/bin"
+_dir="$HOME/.asdf/installs/rust/stable/bin"
 
-[ -d "$dir" ] && {
-	PATH="$PATH:$dir"
+[ -d "$_dir" ] && {
+	PATH="$PATH:$_dir"
+}
+
+command -v sccache >/dev/null &&  {
+	export RUSTC_WRAPPER=sccache
 }

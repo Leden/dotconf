@@ -131,6 +131,7 @@ let g:ale_fixers = {
 \   'yaml': [],
 \   'elixir': ['mix_format'],
 \   'elm': ['elm-format'],
+\   'rust': ['rustfmt'],
 \}
 let g:ale_linters = { 'elm': ['elm_ls'] }
 let g:ale_fix_on_save = 1

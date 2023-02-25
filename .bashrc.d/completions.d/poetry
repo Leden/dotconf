@@ -1,1 +1,1 @@
-which poetry >/dev/null && source <(poetry completions bash)
+#which poetry >/dev/null && source <(poetry completions bash)
