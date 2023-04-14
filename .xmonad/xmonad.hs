@@ -30,4 +30,13 @@ main = do
             , ((mod4Mask .|. mod1Mask, xK_F2), spawn "setxkbmap ru") -- Win+AltL+F2: RU keyb layout
             , ((mod4Mask .|. mod1Mask, xK_F3), spawn "setxkbmap lt") -- Win+AltL+F3: LT keyb layout
             , ((mod4Mask .|. mod1Mask, xK_F4), spawn "setxkbmap 'us(altgr-intl)'") -- Win+AltL+F4: US-intl keyb layout
+            , ((mod4Mask .|. mod1Mask, xK_h), spawn "xdotool mousemove_relative -- -10 0") -- Win+AltL+h: move mouse cursor left 10px
+            , ((mod4Mask .|. mod1Mask, xK_j), spawn "xdotool mousemove_relative -- 0 10") -- Win+AltL+j: move mouse cursor down 10px
+            , ((mod4Mask .|. mod1Mask, xK_k), spawn "xdotool mousemove_relative -- 0 -10") -- Win+AltL+k: move mouse cursor up 10px
+            , ((mod4Mask .|. mod1Mask, xK_l), spawn "xdotool mousemove_relative -- 10 0") -- Win+AltL+l: move mouse cursor right 10px
+            , ((mod4Mask .|. mod1Mask, xK_y), spawn "xdotool click 1") -- Win+AltL+y: mouse left-click
+            , ((mod4Mask .|. mod1Mask, xK_u), spawn "xdotool click 2") -- Win+AltL+u: mouse middle-click
+            , ((mod4Mask .|. mod1Mask, xK_i), spawn "xdotool click 3") -- Win+AltL+i: mouse right-click
+            , ((mod4Mask .|. mod1Mask, xK_o), spawn "xdotool click 4") -- Win+AltL+o: mouse scroll up
+            , ((mod4Mask .|. mod1Mask, xK_p), spawn "xdotool click 5") -- Win+AltL+p: mouse scroll down
             ]
