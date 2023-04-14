@@ -1,7 +1,6 @@
 #!/bin/sh
 set -eux
 
-
 which gh >/dev/null || {
   printf "ERROR: gh it not installed" && exit 1
 }
