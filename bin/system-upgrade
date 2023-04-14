@@ -15,6 +15,11 @@ _upgrade() {
 	command -v flatpak && {
 		flatpak update -y
 	}
+
+	command -v nix && {
+		nix upgrade-nix
+		nix-env --upgrade
+	}
 }
 
 
