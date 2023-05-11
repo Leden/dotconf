@@ -141,6 +141,8 @@ let g:ale_lint_on_insert_leave = 1
 let g:ale_lint_on_save = 1
 let g:ale_elm_format_use_global = 1
 let g:ale_open_list = 1
+let g:ale_sh_shellcheck_options = '--external-sources'
+
 
 autocmd FileType qf setlocal wrap
 
