@@ -44,6 +44,7 @@ Plugin 'sheerun/vim-polyglot'  " Syntax higlighting
 Plugin 'dense-analysis/ale'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'codota/tabnine-vim'  " Autocomplete
+Plugin 'jremmen/vim-ripgrep'  " ripgrep
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
