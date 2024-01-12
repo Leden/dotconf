@@ -12,3 +12,7 @@ if [ -x /usr/bin/gnome-power-manager ] ; then
    sleep 3
    gnome-power-manager &
 fi
+
+pgrep ssh-agent || eval "$(ssh-agent)"
+
+pgrep fluxgui || fluxgui &
