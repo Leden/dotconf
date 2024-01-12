@@ -44,3 +44,5 @@
 	noprefix = true
 [grep]
 	lineNumber = true
+[init]
+	defaultBranch = master
