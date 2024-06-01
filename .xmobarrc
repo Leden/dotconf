@@ -2,22 +2,34 @@ Config
     { bgColor = "black"
     , fgColor = "grey"
     , position = Top
-    , font = "xft:Liberation Mono Regular:size=10:antialias=true,Unifont:antialias=true:size=10"
+    , font = "xft:Dogica Pixel Regular:size=8:antialias=false"
     , commands =
         [ Run Kbd [("us", "US"), ("ru", "RU")]
         , Run StdinReader
         , Run Date "%a %F %H:%M" "theDate" 600
         , Run Com "myip" [] "ip" 120
         , Run Com "get-master-volume" [] "volume" 10
-        , Run Memory ["-t","🐏 <usedratio>%"] 10
+        , Run Memory
+            [ "-t", "M <usedratio>%"
+            , "--Low", "50"
+            , "--High", "85"
+            , "--low", "#C6FD57"
+            , "--normal", "#FFFF58"
+            , "--high", "#F855B1"
+            ] 10
         , Run Battery
             [ "-t", "<acstatus>"
+            , "--Low", "40"
+            , "--High", "80"
+            , "--low", "#F855B1"
+            , "--normal", "#FFFF58"
+            , "--high", "#C6FD57"
             , "--"
-            , "-O", "🔌 <left>% <timeleft>"
-            , "-o", "🔋 <left>% <timeleft>"
-            , "-i", "█ <left>% <timeleft>"
+            , "-O", "C <left>% <timeleft>"
+            , "-o", "D <left>% <timeleft>"
+            , "-i", "F <left>% <timeleft>"
             ] 10
         ]
-    , template = "%StdinReader% }{ <fc=#FF8B19>%volume%</fc> ⋮ <fc=#FFB919>%battery%</fc> ⋮ <fc=#99FF99>%memory%</fc> ⋮ <fc=#FF3319>%kbd%</fc> ⋮ <fc=#1EC9F1>%ip%</fc> ⋮ <fc=#FF1E00>%theDate%</fc>"
+    , template = "%StdinReader% }{ <fc=#FAF3FE>%volume%</fc> ⋮ %battery% ⋮ %memory% ⋮ <fc=#D59AF6>%kbd%</fc> ⋮ <fc=#D59AF6>%ip%</fc> ⋮ <fc=#FAF3FE>%theDate%</fc>"
     }
--- Colors: paletton.com/#uid=60z0u0kl1Wx1x+IcEXDsUWkWEVB
+-- Colors: https://paletton.com/#uid=74H0u0kl1Wx1x+IcEXDsUWkWEVB
