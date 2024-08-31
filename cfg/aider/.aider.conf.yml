@@ -1,0 +1,6 @@
+dark-mode: true
+env-file: /home/den-lesnov/.aider.env
+#model: groq/llama-3.1-70b-versatile
+show-diffs: true
+auto-commits: false
+#deepseek: true
