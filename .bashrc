@@ -134,3 +134,6 @@ export EDITOR="$VISUAL"
 ( which stack >/dev/null ) && eval "$(stack --bash-completion-script stack)"
 
 . $HOME/cfg/bash/bashrc #:cfg:bash:bashrc
+
+# Nix Home Manager
+source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
