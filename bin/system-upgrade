@@ -18,7 +18,8 @@ _upgrade() {
 
 	command -v nix && {
 		nix upgrade-nix
-		nix-env --upgrade
+		nix profile upgrade
+		nix-collect-garbage -d
 	}
 }
 
