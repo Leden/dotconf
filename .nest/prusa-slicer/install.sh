@@ -32,12 +32,13 @@ query {
 }
 "
 
-url=$(gh api graphql -f query="$query" | jq -r '
-  .data.repository.latestRelease.releaseAssets.nodes[]
-  | select(.name|test("linux-x64-GTK3.*AppImage$"))
-  | .downloadUrl'
+url=$(gh api graphql -f query="$query" \
+    | jq -r '
+      .data.repository.latestRelease.releaseAssets.nodes[]
+      | select(.name|test("linux-x64-GTK3.*AppImage$"))
+      | .downloadUrl' \
+    | grep -v 'Ubuntu-24-04'
 )
-
 
 sudo mkdir -p "$install_dir"
 sudo chown -R "$(whoami):" "$install_dir"
